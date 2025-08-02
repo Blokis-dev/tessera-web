@@ -9,17 +9,19 @@ import Link from "next/link"
 
 export function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
-
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex h-16 items-center justify-between">
           <div className="flex items-center">
             <div className="flex items-center space-x-2">
-              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-tessera-blue-500 to-tessera-cyan-500">
+              <div className="flex h-8 w-8 items-center justify-center rounded-lg"
+                style={{
+                  background: "linear-gradient(135deg, var(--primary), var(--accent))"
+                }}>
                 <Shield className="h-5 w-5 text-white" />
               </div>
-              <span className="text-xl font-bold bg-gradient-to-r from-tessera-blue-600 to-tessera-cyan-600 bg-clip-text text-transparent">
+              <span className="text-xl font-bold bg-gradient-to-r from-[var(--primary)] to-[var(--accent)] bg-clip-text text-transparent">
                 Tessera
               </span>
             </div>
@@ -44,9 +46,20 @@ export function Header() {
           <div className="hidden md:flex items-center space-x-4">
             <ThemeToggle />
             <Link href="/auth/login">
-              <Button variant="outline" className="w-full bg-transparent">Iniciar Sesións</Button>
+              <Button variant="outline"
+                className="w-full bg-transparent"
+                style={{
+                  borderColor: "var(--primary)",
+                  color: "var(--primary)"
+                }}>
+                Iniciar Sesión
+              </Button>
             </Link>
-            <Button className="bg-gradient-to-r from-tessera-blue-500 to-tessera-cyan-500 hover:from-tessera-blue-600 hover:to-tessera-cyan-600">
+            <Button className="w-50"
+              style={{
+                background: "linear-gradient(90deg, var(--primary), var(--accent))",
+                color: "var(--primary-foreground)"
+              }}>
               Comenzar Gratis
             </Button>
           </div>
