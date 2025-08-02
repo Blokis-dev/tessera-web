@@ -5,6 +5,8 @@ import { Button } from "@/components/ui/button"
 import { ThemeToggle } from "./theme-toggle"
 import { Menu, X, Shield } from "lucide-react"
 
+import Link from "next/link"
+
 export function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
 
@@ -41,7 +43,9 @@ export function Header() {
 
           <div className="hidden md:flex items-center space-x-4">
             <ThemeToggle />
-            <Button variant="outline">Iniciar Sesión</Button>
+            <Link href="/auth/login">
+              <Button variant="outline" className="w-full bg-transparent">Iniciar Sesións</Button>
+            </Link>
             <Button className="bg-gradient-to-r from-tessera-blue-500 to-tessera-cyan-500 hover:from-tessera-blue-600 hover:to-tessera-cyan-600">
               Comenzar Gratis
             </Button>
@@ -79,9 +83,10 @@ export function Header() {
                 Contacto
               </a>
               <div className="flex flex-col space-y-2 px-3 pt-4">
-                <Button variant="outline" className="w-full bg-transparent">
-                  Iniciar Sesión
-                </Button>
+
+                <Link href="/auth/login">
+                  <Button variant="outline" className="w-full bg-transparent">Iniciar Sesións</Button>
+                </Link>
                 <Button className="w-full bg-gradient-to-r from-tessera-blue-500 to-tessera-cyan-500 hover:from-tessera-blue-600 hover:to-tessera-cyan-600">
                   Comenzar Gratis
                 </Button>
