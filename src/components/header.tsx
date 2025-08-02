@@ -41,6 +41,9 @@ export function Header() {
             <a href="#contact" className="text-sm font-medium hover:text-primary transition-colors">
               Contacto
             </a>
+              <a href="/verificar" className="text-sm font-medium hover:text-primary transition-colors">
+              Verificar
+            </a>
           </nav>
 
           <div className="hidden md:flex items-center space-x-4">

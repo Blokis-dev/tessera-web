@@ -20,7 +20,7 @@ export default function RootLayout({
   return (
     <html lang="es" suppressHydrationWarning>
       <body className={inter.className}>
-        <ThemeProvider defaultTheme="system" storageKey="tessera-ui-theme">
+        <ThemeProvider>
           {children}
         </ThemeProvider>
       </body>
