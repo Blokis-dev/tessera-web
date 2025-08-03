@@ -141,26 +141,74 @@ export function SolicitudesList({ onViewDetails }: SolicitudesListProps) {
   const getStatusBadge = (status: string) => {
     switch (status) {
       case "pending":
-        return <Badge variant="outline" className="bg-yellow-50 text-yellow-700 border-yellow-200">Pendiente</Badge>
+        return (
+          <Badge 
+            variant="outline" 
+            className="bg-yellow-50 text-yellow-700 border-yellow-200 dark:bg-yellow-900/20 dark:text-yellow-300 dark:border-yellow-800"
+          >
+            Pendiente
+          </Badge>
+        )
       case "verified":
-        return <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">Aprobada</Badge>
+        return (
+          <Badge 
+            variant="outline" 
+            className="bg-green-50 text-green-700 border-green-200 dark:bg-green-900/20 dark:text-green-300 dark:border-green-800"
+          >
+            Aprobada
+          </Badge>
+        )
       case "rejected":
-        return <Badge variant="outline" className="bg-red-50 text-red-700 border-red-200">Rechazada</Badge>
+        return (
+          <Badge 
+            variant="outline" 
+            className="bg-red-50 text-red-700 border-red-200 dark:bg-red-900/20 dark:text-red-300 dark:border-red-800"
+          >
+            Rechazada
+          </Badge>
+        )
       default:
         return <Badge variant="outline">Desconocido</Badge>
     }
   }
 
   const getTypeIcon = (type: string) => {
-    return <User className="h-4 w-4" />
+    return <User className="h-4 w-4" style={{ color: "var(--primary)" }} />
   }
 
   if (loading) {
     return (
       <div className="space-y-6">
-        <h1 className="text-3xl font-bold">Solicitudes Pendientes</h1>
+        <div className="space-y-2">
+          <h1 className="text-3xl font-bold tracking-tight">
+            Solicitudes{" "}
+            <span 
+              className="bg-clip-text text-transparent"
+              style={{
+                background: "linear-gradient(90deg, var(--primary), var(--accent))",
+                WebkitBackgroundClip: "text",
+                backgroundClip: "text"
+              }}
+            >
+              Pendientes
+            </span>
+          </h1>
+        </div>
         <div className="flex items-center justify-center py-12">
-          <Loader2 className="h-8 w-8 animate-spin" />
+          <div className="flex flex-col items-center gap-3">
+            <div 
+              className="p-3 rounded-full"
+              style={{
+                background: "linear-gradient(135deg, var(--primary)/10, var(--accent)/10)"
+              }}
+            >
+              <Loader2 
+                className="h-8 w-8 animate-spin" 
+                style={{ color: "var(--primary)" }}
+              />
+            </div>
+            <p className="text-muted-foreground">Cargando solicitudes...</p>
+          </div>
         </div>
       </div>
     )
@@ -170,10 +218,19 @@ export function SolicitudesList({ onViewDetails }: SolicitudesListProps) {
     return (
       <div className="space-y-6">
         <h1 className="text-3xl font-bold">Solicitudes Pendientes</h1>
-        <div className="flex items-center gap-2 p-4 text-red-800 bg-red-100 border border-red-200 rounded-md dark:bg-red-900/20 dark:text-red-400 dark:border-red-800">
-          <AlertCircle className="h-4 w-4" />
-          {error}
-        </div>
+        <Card className="border-red-200 dark:border-red-800">
+          <CardContent className="p-6">
+            <div className="flex items-center gap-3 text-red-800 dark:text-red-400">
+              <div className="p-2 rounded-full bg-red-100 dark:bg-red-900/30">
+                <AlertCircle className="h-5 w-5" />
+              </div>
+              <div>
+                <p className="font-medium">Error al cargar las solicitudes</p>
+                <p className="text-sm opacity-80">{error}</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
       </div>
     )
   }
@@ -182,16 +239,32 @@ export function SolicitudesList({ onViewDetails }: SolicitudesListProps) {
     <div className="space-y-6">
       {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <div>
-          <h1 className="text-3xl font-bold">Solicitudes Pendientes</h1>
-          <p className="text-muted-foreground">
-            Gestiona las solicitudes de nuevos usuarios e instituciones (creados atomicamente)
+        <div className="space-y-2">
+          <h1 className="text-3xl font-bold tracking-tight">
+            Solicitudes{" "}
+            <span 
+              className="bg-clip-text text-transparent"
+              style={{
+                background: "linear-gradient(90deg, var(--primary), var(--accent))",
+                WebkitBackgroundClip: "text",
+                backgroundClip: "text"
+              }}
+            >
+              Pendientes
+            </span>
+          </h1>
+          <p className="text-muted-foreground text-lg">
+            Gestiona las solicitudes de nuevos usuarios e instituciones
           </p>
         </div>
         <Button 
           onClick={() => fetchSolicitudes()} 
           variant="outline"
-          className="gap-2"
+          className="gap-2 transition-all duration-200"
+          style={{
+            borderColor: "var(--primary)",
+            color: "var(--primary)"
+          }}
         >
           <Search className="h-4 w-4" />
           Actualizar
@@ -206,12 +279,20 @@ export function SolicitudesList({ onViewDetails }: SolicitudesListProps) {
             placeholder="Buscar por nombre, institución, email o NIT..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-10"
+            className="pl-10 transition-all duration-200"
+            style={{
+              borderColor: "var(--border)"
+            }}
           />
         </div>
         <Select value={statusFilter} onValueChange={setStatusFilter}>
-          <SelectTrigger className="w-full sm:w-48">
-            <Filter className="mr-2 h-4 w-4" />
+          <SelectTrigger 
+            className="w-full sm:w-48 transition-all duration-200"
+            style={{
+              borderColor: "var(--border)"
+            }}
+          >
+            <Filter className="mr-2 h-4 w-4" style={{ color: "var(--primary)" }} />
             <SelectValue placeholder="Filtrar por estado" />
           </SelectTrigger>
           <SelectContent>
@@ -226,44 +307,77 @@ export function SolicitudesList({ onViewDetails }: SolicitudesListProps) {
       {/* Lista de solicitudes */}
       <div className="grid gap-4">
         {filteredSolicitudes.length === 0 ? (
-          <Card className="p-8 text-center">
-            <p className="text-muted-foreground">No se encontraron solicitudes que coincidan con los filtros.</p>
+          <Card className="backdrop-blur-sm bg-background/95 border shadow-lg">
+            <CardContent className="p-8 text-center">
+              <div className="flex flex-col items-center gap-4">
+                <div 
+                  className="p-4 rounded-full"
+                  style={{
+                    background: "linear-gradient(135deg, var(--primary)/10, var(--accent)/10)"
+                  }}
+                >
+                  <Search className="h-8 w-8" style={{ color: "var(--primary)" }} />
+                </div>
+                <div>
+                  <p className="font-medium">No se encontraron solicitudes</p>
+                  <p className="text-muted-foreground text-sm">
+                    No hay solicitudes que coincidan con los filtros aplicados.
+                  </p>
+                </div>
+              </div>
+            </CardContent>
           </Card>
         ) : (
           filteredSolicitudes.map((solicitud) => (
-            <Card key={solicitud.id} className="hover:shadow-md transition-shadow">
+            <Card 
+              key={solicitud.id} 
+              className="hover:shadow-lg transition-all duration-200 backdrop-blur-sm bg-background/95 border"
+            >
               <CardContent className="p-6">
                 <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
                   <div className="flex items-start gap-4">
-                    <div className="p-2 bg-muted rounded-lg">
+                    <div 
+                      className="p-3 rounded-lg"
+                      style={{
+                        background: "linear-gradient(135deg, var(--primary)/10, var(--accent)/10)"
+                      }}
+                    >
                       {getTypeIcon(solicitud.type)}
                     </div>
-                    <div className="space-y-1 flex-1">
-                      <div className="flex items-center gap-2">
-                        <h3 className="font-semibold">{solicitud.institutionName}</h3>
-                        <Badge variant="secondary" className="text-xs">
+                    <div className="space-y-2 flex-1">
+                      <div className="flex items-center gap-3">
+                        <h3 className="font-semibold text-lg">{solicitud.institutionName}</h3>
+                        <Badge 
+                          variant="secondary" 
+                          className="text-xs"
+                          style={{
+                            background: "linear-gradient(135deg, var(--accent)/20, var(--primary)/20)",
+                            color: "var(--primary)",
+                            border: "1px solid var(--primary)/20"
+                          }}
+                        >
                           Usuario + Institución
                         </Badge>
                       </div>
-                      <div className="text-sm text-muted-foreground space-y-1">
+                      <div className="text-sm text-muted-foreground space-y-2">
                         <div className="flex items-center gap-2">
-                          <Mail className="h-3 w-3" />
+                          <Mail className="h-4 w-4" style={{ color: "var(--accent)" }} />
                           <span>{solicitud.email}</span>
                         </div>
                         {solicitud.userName !== 'Pendiente de asignación' && (
                           <div className="flex items-center gap-2">
-                            <Building className="h-3 w-3" />
+                            <Building className="h-4 w-4" style={{ color: "var(--primary)" }} />
                             <span>Contacto: {solicitud.userName}</span>
                           </div>
                         )}
                         {solicitud.legalId && (
                           <div className="flex items-center gap-2">
-                            <Calendar className="h-3 w-3" />
+                            <Calendar className="h-4 w-4" style={{ color: "var(--accent)" }} />
                             <span>NIT: {solicitud.legalId}</span>
                           </div>
                         )}
                         <div className="flex items-center gap-2">
-                          <Calendar className="h-3 w-3" />
+                          <Calendar className="h-4 w-4" style={{ color: "var(--primary)" }} />
                           <span>
                             Creado: {new Date(solicitud.createdAt).toLocaleDateString('es-ES', {
                               year: 'numeric',
@@ -281,7 +395,12 @@ export function SolicitudesList({ onViewDetails }: SolicitudesListProps) {
                     <Button
                       size="sm"
                       onClick={() => onViewDetails(solicitud.id)}
-                      className="gap-2"
+                      className="gap-2 transition-all duration-200"
+                      style={{
+                        background: "linear-gradient(90deg, var(--primary), var(--accent))",
+                        color: "white",
+                        border: "none"
+                      }}
                     >
                       <Eye className="h-4 w-4" />
                       Ver Detalles
@@ -296,30 +415,75 @@ export function SolicitudesList({ onViewDetails }: SolicitudesListProps) {
 
       {/* Estadísticas */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <Card>
+        <Card className="backdrop-blur-sm bg-background/95 border shadow-lg relative overflow-hidden">
+          <div 
+            className="absolute top-0 left-0 right-0 h-1"
+            style={{
+              background: "linear-gradient(90deg, var(--primary), var(--accent))"
+            }}
+          />
           <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Total Solicitudes</CardTitle>
+            <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
+              <div 
+                className="p-1 rounded"
+                style={{
+                  background: "linear-gradient(135deg, var(--primary)/10, var(--accent)/10)"
+                }}
+              >
+                <Search className="h-3 w-3" style={{ color: "var(--primary)" }} />
+              </div>
+              Total Solicitudes
+            </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{solicitudes.length}</div>
+            <div 
+              className="text-2xl font-bold"
+              style={{ color: "var(--primary)" }}
+            >
+              {solicitudes.length}
+            </div>
           </CardContent>
         </Card>
-        <Card>
+
+        <Card className="backdrop-blur-sm bg-background/95 border shadow-lg relative overflow-hidden">
+          <div 
+            className="absolute top-0 left-0 right-0 h-1"
+            style={{
+              background: "linear-gradient(90deg, #f59e0b, #d97706)"
+            }}
+          />
           <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Pendientes</CardTitle>
+            <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
+              <div className="p-1 rounded bg-yellow-100 dark:bg-yellow-900/30">
+                <AlertCircle className="h-3 w-3 text-yellow-600 dark:text-yellow-400" />
+              </div>
+              Pendientes
+            </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-yellow-600">
+            <div className="text-2xl font-bold text-yellow-600 dark:text-yellow-400">
               {solicitudes.filter(s => s.status === 'pending').length}
             </div>
           </CardContent>
         </Card>
-        <Card>
+
+        <Card className="backdrop-blur-sm bg-background/95 border shadow-lg relative overflow-hidden">
+          <div 
+            className="absolute top-0 left-0 right-0 h-1"
+            style={{
+              background: "linear-gradient(90deg, #10b981, #059669)"
+            }}
+          />
           <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Aprobadas</CardTitle>
+            <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
+              <div className="p-1 rounded bg-green-100 dark:bg-green-900/30">
+                <Eye className="h-3 w-3 text-green-600 dark:text-green-400" />
+              </div>
+              Aprobadas
+            </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-green-600">
+            <div className="text-2xl font-bold text-green-600 dark:text-green-400">
               {solicitudes.filter(s => s.status === 'verified').length}
             </div>
           </CardContent>

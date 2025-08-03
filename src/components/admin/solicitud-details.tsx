@@ -163,11 +163,32 @@ export function SolicitudDetails({ solicitudId, onBack }: SolicitudDetailsProps)
   const getStatusBadge = (status: string) => {
     switch (status) {
       case "pending":
-        return <Badge variant="outline" className="bg-yellow-50 text-yellow-700 border-yellow-200">Pendiente</Badge>
+        return (
+          <Badge 
+            variant="outline" 
+            className="bg-yellow-50 text-yellow-700 border-yellow-200 dark:bg-yellow-900/20 dark:text-yellow-300 dark:border-yellow-800"
+          >
+            Pendiente
+          </Badge>
+        )
       case "verified":
-        return <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">Aprobada</Badge>
+        return (
+          <Badge 
+            variant="outline" 
+            className="bg-green-50 text-green-700 border-green-200 dark:bg-green-900/20 dark:text-green-300 dark:border-green-800"
+          >
+            Aprobada
+          </Badge>
+        )
       case "rejected":
-        return <Badge variant="outline" className="bg-red-50 text-red-700 border-red-200">Rechazada</Badge>
+        return (
+          <Badge 
+            variant="outline" 
+            className="bg-red-50 text-red-700 border-red-200 dark:bg-red-900/20 dark:text-red-300 dark:border-red-800"
+          >
+            Rechazada
+          </Badge>
+        )
       default:
         return <Badge variant="outline">Desconocido</Badge>
     }
@@ -176,12 +197,32 @@ export function SolicitudDetails({ solicitudId, onBack }: SolicitudDetailsProps)
   if (loading) {
     return (
       <div className="space-y-6">
-        <Button onClick={onBack} variant="ghost" className="gap-2">
+        <Button 
+          onClick={onBack} 
+          variant="ghost" 
+          className="gap-2 transition-all duration-200"
+          style={{
+            color: "var(--primary)"
+          }}
+        >
           <ArrowLeft className="h-4 w-4" />
           Volver a Solicitudes
         </Button>
         <div className="flex items-center justify-center py-12">
-          <Loader2 className="h-8 w-8 animate-spin" />
+          <div className="flex flex-col items-center gap-3">
+            <div 
+              className="p-3 rounded-full"
+              style={{
+                background: "linear-gradient(135deg, var(--primary)/10, var(--accent)/10)"
+              }}
+            >
+              <Loader2 
+                className="h-8 w-8 animate-spin" 
+                style={{ color: "var(--primary)" }}
+              />
+            </div>
+            <p className="text-muted-foreground">Cargando detalles...</p>
+          </div>
         </div>
       </div>
     )
@@ -190,14 +231,30 @@ export function SolicitudDetails({ solicitudId, onBack }: SolicitudDetailsProps)
   if (error || !solicitud) {
     return (
       <div className="space-y-6">
-        <Button onClick={onBack} variant="ghost" className="gap-2">
+        <Button 
+          onClick={onBack} 
+          variant="ghost" 
+          className="gap-2 transition-all duration-200"
+          style={{
+            color: "var(--primary)"
+          }}
+        >
           <ArrowLeft className="h-4 w-4" />
           Volver a Solicitudes
         </Button>
-        <div className="flex items-center gap-2 p-4 text-red-800 bg-red-100 border border-red-200 rounded-md dark:bg-red-900/20 dark:text-red-400 dark:border-red-800">
-          <AlertCircle className="h-4 w-4" />
-          {error || 'Error al cargar los detalles'}
-        </div>
+        <Card className="border-red-200 dark:border-red-800 backdrop-blur-sm bg-background/95">
+          <CardContent className="p-6">
+            <div className="flex items-center gap-3 text-red-800 dark:text-red-400">
+              <div className="p-2 rounded-full bg-red-100 dark:bg-red-900/30">
+                <AlertCircle className="h-5 w-5" />
+              </div>
+              <div>
+                <p className="font-medium">Error al cargar los detalles</p>
+                <p className="text-sm opacity-80">{error || 'Error desconocido'}</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
       </div>
     )
   }
@@ -208,11 +265,38 @@ export function SolicitudDetails({ solicitudId, onBack }: SolicitudDetailsProps)
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <Button onClick={onBack} variant="ghost" className="gap-2">
-          <ArrowLeft className="h-4 w-4" />
-          Volver a Solicitudes
-        </Button>
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div className="flex items-center gap-4">
+          <Button 
+            onClick={onBack} 
+            variant="ghost" 
+            className="gap-2 transition-all duration-200"
+            style={{
+              color: "var(--primary)"
+            }}
+          >
+            <ArrowLeft className="h-4 w-4" />
+            Volver a Solicitudes
+          </Button>
+          <div className="space-y-1">
+            <h1 className="text-2xl font-bold tracking-tight">
+              Detalles de{" "}
+              <span 
+                className="bg-clip-text text-transparent"
+                style={{
+                  background: "linear-gradient(90deg, var(--primary), var(--accent))",
+                  WebkitBackgroundClip: "text",
+                  backgroundClip: "text"
+                }}
+              >
+                Solicitud
+              </span>
+            </h1>
+            <p className="text-muted-foreground">
+              {solicitud.user?.full_name} - {solicitud.user?.institution_name}
+            </p>
+          </div>
+        </div>
         <div className="flex items-center gap-2">
           {getStatusBadge(currentStatus)}
           {isEditable && (
@@ -223,7 +307,7 @@ export function SolicitudDetails({ solicitudId, onBack }: SolicitudDetailsProps)
                   setIsApprovalModalOpen(true)
                 }}
                 variant="outline"
-                className="gap-2 text-red-600 border-red-200 hover:bg-red-50"
+                className="gap-2 text-red-600 border-red-200 hover:bg-red-50 dark:border-red-800 dark:hover:bg-red-950/50 transition-all duration-200"
               >
                 <XCircle className="h-4 w-4" />
                 Rechazar
@@ -233,7 +317,11 @@ export function SolicitudDetails({ solicitudId, onBack }: SolicitudDetailsProps)
                   setActionType("approve")
                   setIsApprovalModalOpen(true)
                 }}
-                className="gap-2 bg-green-600 hover:bg-green-700"
+                className="gap-2 transition-all duration-200"
+                style={{
+                  background: "linear-gradient(90deg, #10b981, #059669)",
+                  color: "white"
+                }}
               >
                 <CheckCircle className="h-4 w-4" />
                 Aprobar
@@ -248,47 +336,71 @@ export function SolicitudDetails({ solicitudId, onBack }: SolicitudDetailsProps)
         <div className="lg:col-span-2 space-y-6">
           {solicitud.type === 'user' && solicitud.user && (
             <>
-              <Card>
+              <Card className="backdrop-blur-sm bg-background/95 border shadow-lg relative overflow-hidden">
+                <div 
+                  className="absolute top-0 left-0 right-0 h-1"
+                  style={{
+                    background: "linear-gradient(90deg, var(--primary), var(--accent))"
+                  }}
+                />
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
-                    <User className="h-5 w-5" />
+                    <div 
+                      className="p-2 rounded-lg"
+                      style={{
+                        background: "linear-gradient(135deg, var(--primary)/10, var(--accent)/10)"
+                      }}
+                    >
+                      <User className="h-5 w-5" style={{ color: "var(--primary)" }} />
+                    </div>
                     Información del Usuario
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="grid gap-4 md:grid-cols-2">
-                    <div>
+                    <div className="p-4 rounded-lg bg-muted/30 border">
                       <label className="text-sm font-medium text-muted-foreground">Nombre Completo</label>
-                      <p className="font-medium">{solicitud.user.full_name}</p>
+                      <p className="font-medium mt-1">{solicitud.user.full_name}</p>
                     </div>
-                    <div>
+                    <div className="p-4 rounded-lg bg-muted/30 border">
                       <label className="text-sm font-medium text-muted-foreground">Email</label>
-                      <div className="flex items-center gap-2">
-                        <Mail className="h-4 w-4 text-muted-foreground" />
-                        <p>{solicitud.user.email}</p>
+                      <div className="flex items-center gap-2 mt-1">
+                        <Mail className="h-4 w-4" style={{ color: "var(--accent)" }} />
+                        <p className="font-medium">{solicitud.user.email}</p>
                       </div>
                     </div>
                   </div>
 
                   <div className="grid gap-4 md:grid-cols-2">
-                    <div>
+                    <div className="p-4 rounded-lg bg-muted/30 border">
                       <label className="text-sm font-medium text-muted-foreground">Rol</label>
-                      <p className="font-medium">{solicitud.user.role === 'owner' ? 'Propietario' : solicitud.user.role}</p>
+                      <div className="flex items-center gap-2 mt-1">
+                        <Badge 
+                          variant="secondary"
+                          style={{
+                            background: "linear-gradient(135deg, var(--primary)/20, var(--accent)/20)",
+                            color: "var(--primary)",
+                            border: "1px solid var(--primary)/20"
+                          }}
+                        >
+                          {solicitud.user.role === 'owner' ? 'Propietario' : solicitud.user.role}
+                        </Badge>
+                      </div>
                     </div>
-                    <div>
+                    <div className="p-4 rounded-lg bg-muted/30 border">
                       <label className="text-sm font-medium text-muted-foreground">Institución</label>
-                      <div className="flex items-center gap-2">
-                        <Building className="h-4 w-4 text-muted-foreground" />
+                      <div className="flex items-center gap-2 mt-1">
+                        <Building className="h-4 w-4" style={{ color: "var(--primary)" }} />
                         <p className="font-medium">{solicitud.user.institution_name}</p>
                       </div>
                     </div>
                   </div>
 
-                  <div>
+                  <div className="p-4 rounded-lg bg-muted/30 border">
                     <label className="text-sm font-medium text-muted-foreground">Fecha de Solicitud</label>
-                    <div className="flex items-center gap-2">
-                      <Calendar className="h-4 w-4 text-muted-foreground" />
-                      <p>
+                    <div className="flex items-center gap-2 mt-1">
+                      <Calendar className="h-4 w-4" style={{ color: "var(--accent)" }} />
+                      <p className="font-medium">
                         {new Date(solicitud.user.created_at).toLocaleDateString('es-ES', {
                           year: 'numeric',
                           month: 'long',
@@ -301,20 +413,70 @@ export function SolicitudDetails({ solicitudId, onBack }: SolicitudDetailsProps)
                   </div>
                 </CardContent>
               </Card>
+
+              {/* Card adicional con información complementaria */}
+              <Card className="backdrop-blur-sm bg-background/95 border shadow-lg relative overflow-hidden">
+                <div 
+                  className="absolute top-0 left-0 right-0 h-1"
+                  style={{
+                    background: "linear-gradient(90deg, var(--accent), var(--primary))"
+                  }}
+                />
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <div 
+                      className="p-2 rounded-lg"
+                      style={{
+                        background: "linear-gradient(135deg, var(--accent)/10, var(--primary)/10)"
+                      }}
+                    >
+                      <FileText className="h-5 w-5" style={{ color: "var(--accent)" }} />
+                    </div>
+                    Información Adicional
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="grid gap-4 md:grid-cols-2">
+                    <div className="p-4 rounded-lg border" style={{ background: "var(--muted)/30" }}>
+                      <label className="text-sm font-medium text-muted-foreground">ID de Usuario</label>
+                      <p className="font-mono text-sm mt-1" style={{ color: "var(--primary)" }}>
+                        {solicitud.user.id}
+                      </p>
+                    </div>
+                    <div className="p-4 rounded-lg border" style={{ background: "var(--muted)/30" }}>
+                      <label className="text-sm font-medium text-muted-foreground">Estado Actual</label>
+                      <div className="mt-1">
+                        {getStatusBadge(currentStatus)}
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
             </>
           )}
         </div>
 
         {/* Panel lateral */}
         <div className="space-y-6">
-          <Card>
+          <Card className="backdrop-blur-sm bg-background/95 border shadow-lg relative overflow-hidden">
+            <div 
+              className="absolute top-0 left-0 right-0 h-1"
+              style={{
+                background: "linear-gradient(90deg, var(--primary), var(--accent))"
+              }}
+            />
             <CardHeader>
-              <CardTitle>Avatar</CardTitle>
+              <CardTitle>Avatar del Usuario</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="flex flex-col items-center space-y-4">
                 <Avatar className="h-20 w-20">
-                  <AvatarFallback className="text-lg bg-gradient-to-r from-blue-500 to-purple-500 text-white">
+                  <AvatarFallback 
+                    className="text-lg text-white"
+                    style={{
+                      background: "linear-gradient(135deg, var(--primary), var(--accent))"
+                    }}
+                  >
                     {solicitud.user ? getInitials(solicitud.user.full_name) : 'N/A'}
                   </AvatarFallback>
                 </Avatar>
@@ -330,30 +492,108 @@ export function SolicitudDetails({ solicitudId, onBack }: SolicitudDetailsProps)
             </CardContent>
           </Card>
 
-          <Card>
+          <Card className="backdrop-blur-sm bg-background/95 border shadow-lg relative overflow-hidden">
+            <div 
+              className="absolute top-0 left-0 right-0 h-1"
+              style={{
+                background: "linear-gradient(90deg, var(--accent), var(--primary))"
+              }}
+            />
             <CardHeader>
-              <CardTitle>Resumen de la Solicitud</CardTitle>
+              <CardTitle className="flex items-center gap-2">
+                <div 
+                  className="p-1 rounded"
+                  style={{
+                    background: "linear-gradient(135deg, var(--accent)/10, var(--primary)/10)"
+                  }}
+                >
+                  <FileText className="h-4 w-4" style={{ color: "var(--accent)" }} />
+                </div>
+                Resumen de la Solicitud
+              </CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
-              <div className="flex justify-between items-center py-2 border-b">
+              <div className="flex justify-between items-center py-3 px-3 rounded-lg bg-muted/30 border">
                 <span className="text-sm text-muted-foreground">Tipo</span>
-                <span className="text-sm font-medium">Usuario y Institución</span>
+                <Badge 
+                  variant="secondary"
+                  style={{
+                    background: "linear-gradient(135deg, var(--primary)/20, var(--accent)/20)",
+                    color: "var(--primary)",
+                    border: "1px solid var(--primary)/20"
+                  }}
+                >
+                  Usuario + Institución
+                </Badge>
               </div>
-              <div className="flex justify-between items-center py-2 border-b">
+              <div className="flex justify-between items-center py-3 px-3 rounded-lg bg-muted/30 border">
                 <span className="text-sm text-muted-foreground">Estado</span>
                 {getStatusBadge(currentStatus)}
               </div>
-              <div className="flex justify-between items-center py-2">
+              <div className="flex justify-between items-center py-3 px-3 rounded-lg bg-muted/30 border">
                 <span className="text-sm text-muted-foreground">Fecha</span>
-                <span className="text-sm font-medium">
+                <span className="text-sm font-medium" style={{ color: "var(--primary)" }}>
                   {new Date(solicitud.user?.created_at || '').toLocaleDateString('es-ES', { 
                     month: 'short', 
-                    day: 'numeric' 
+                    day: 'numeric',
+                    year: 'numeric'
                   })}
                 </span>
               </div>
             </CardContent>
           </Card>
+
+          {/* Card de acciones rápidas */}
+          {isEditable && (
+            <Card className="backdrop-blur-sm bg-background/95 border shadow-lg relative overflow-hidden">
+              <div 
+                className="absolute top-0 left-0 right-0 h-1"
+                style={{
+                  background: "linear-gradient(90deg, #f59e0b, #d97706)"
+                }}
+              />
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <div className="p-1 rounded bg-yellow-100 dark:bg-yellow-900/30">
+                    <AlertCircle className="h-4 w-4 text-yellow-600 dark:text-yellow-400" />
+                  </div>
+                  Acciones Requeridas
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <p className="text-sm text-muted-foreground">
+                  Esta solicitud requiere tu aprobación o rechazo para continuar con el proceso.
+                </p>
+                <div className="flex flex-col gap-2">
+                  <Button
+                    onClick={() => {
+                      setActionType("approve")
+                      setIsApprovalModalOpen(true)
+                    }}
+                    className="w-full gap-2 transition-all duration-200"
+                    style={{
+                      background: "linear-gradient(90deg, #10b981, #059669)",
+                      color: "white"
+                    }}
+                  >
+                    <CheckCircle className="h-4 w-4" />
+                    Aprobar Solicitud
+                  </Button>
+                  <Button
+                    onClick={() => {
+                      setActionType("reject")
+                      setIsApprovalModalOpen(true)
+                    }}
+                    variant="outline"
+                    className="w-full gap-2 text-red-600 border-red-200 hover:bg-red-50 dark:border-red-800 dark:hover:bg-red-950/50 transition-all duration-200"
+                  >
+                    <XCircle className="h-4 w-4" />
+                    Rechazar Solicitud
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          )}
         </div>
       </div>
 

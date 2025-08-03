@@ -80,13 +80,27 @@ export function AdminDashboard() {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div>
-        <h1 className="text-3xl font-bold">Panel de Administración</h1>
-        <p className="text-muted-foreground">Bienvenido al panel de control de Tessera</p>
+      {/* Header with gradient text */}
+      <div className="space-y-2">
+        <h1 className="text-3xl font-bold tracking-tight">
+          Panel de{" "}
+          <span 
+            className="bg-clip-text text-transparent"
+            style={{
+              background: "linear-gradient(90deg, var(--primary), var(--accent))",
+              WebkitBackgroundClip: "text",
+              backgroundClip: "text"
+            }}
+          >
+            Administración
+          </span>
+        </h1>
+        <p className="text-muted-foreground text-lg">
+          Bienvenido al panel de control de Tessera
+        </p>
       </div>
 
-      {/* Stats Grid */}
+      {/* Stats Grid with enhanced styling */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <StatsCard
           title="Instituciones Activas"
@@ -117,26 +131,58 @@ export function AdminDashboard() {
         />
       </div>
 
-      {/* Recent Activity */}
+      {/* Recent Activity Cards with enhanced styling */}
       <div className="grid gap-6 md:grid-cols-2">
-        <Card>
+        <Card className="relative overflow-hidden backdrop-blur-sm bg-background/95 border shadow-lg">
+          {/* Subtle gradient overlay */}
+          <div 
+            className="absolute top-0 left-0 right-0 h-1"
+            style={{
+              background: "linear-gradient(90deg, var(--primary), var(--accent))"
+            }}
+          />
           <CardHeader>
-            <CardTitle>Actividad Reciente</CardTitle>
+            <CardTitle className="flex items-center gap-2">
+              <div 
+                className="p-2 rounded-lg"
+                style={{
+                  background: "linear-gradient(135deg, var(--primary)/10, var(--accent)/10)"
+                }}
+              >
+                <Clock className="h-5 w-5" style={{ color: "var(--primary)" }} />
+              </div>
+              Actividad Reciente
+            </CardTitle>
             <CardDescription>Últimas acciones en el sistema</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
               {recentActivity.map((activity) => (
-                <div key={activity.id} className="flex items-center justify-between p-3 border rounded-lg">
+                <div 
+                  key={activity.id} 
+                  className="flex items-center justify-between p-3 border rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors"
+                >
                   <div className="space-y-1">
                     <p className="font-medium text-sm">{activity.action}</p>
                     <p className="text-xs text-muted-foreground">{activity.institution}</p>
                     <p className="text-xs text-muted-foreground">{activity.time}</p>
                   </div>
                   <div className="flex items-center">
-                    {activity.type === "pending" && <Clock className="h-4 w-4 text-yellow-500" />}
-                    {activity.type === "approved" && <CheckCircle className="h-4 w-4 text-green-500" />}
-                    {activity.type === "rejected" && <AlertTriangle className="h-4 w-4 text-red-500" />}
+                    {activity.type === "pending" && (
+                      <div className="p-2 rounded-full bg-yellow-100 dark:bg-yellow-900/30">
+                        <Clock className="h-4 w-4 text-yellow-600 dark:text-yellow-400" />
+                      </div>
+                    )}
+                    {activity.type === "approved" && (
+                      <div className="p-2 rounded-full bg-green-100 dark:bg-green-900/30">
+                        <CheckCircle className="h-4 w-4 text-green-600 dark:text-green-400" />
+                      </div>
+                    )}
+                    {activity.type === "rejected" && (
+                      <div className="p-2 rounded-full bg-red-100 dark:bg-red-900/30">
+                        <AlertTriangle className="h-4 w-4 text-red-600 dark:text-red-400" />
+                      </div>
+                    )}
                   </div>
                 </div>
               ))}
@@ -144,42 +190,163 @@ export function AdminDashboard() {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="relative overflow-hidden backdrop-blur-sm bg-background/95 border shadow-lg">
+          {/* Subtle gradient overlay */}
+          <div 
+            className="absolute top-0 left-0 right-0 h-1"
+            style={{
+              background: "linear-gradient(90deg, var(--accent), var(--primary))"
+            }}
+          />
           <CardHeader>
-            <CardTitle>Estadísticas del Mes</CardTitle>
+            <CardTitle className="flex items-center gap-2">
+              <div 
+                className="p-2 rounded-lg"
+                style={{
+                  background: "linear-gradient(135deg, var(--accent)/10, var(--primary)/10)"
+                }}
+              >
+                <TrendingUp className="h-5 w-5" style={{ color: "var(--accent)" }} />
+              </div>
+              Estadísticas del Mes
+            </CardTitle>
             <CardDescription>Resumen de actividad mensual</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
               <div className="flex items-center justify-between">
                 <span className="text-sm">Solicitudes Recibidas</span>
-                <span className="font-medium">23</span>
+                <span 
+                  className="font-medium text-lg"
+                  style={{ color: "var(--primary)" }}
+                >
+                  23
+                </span>
               </div>
-              <div className="w-full bg-muted rounded-full h-2">
+              <div className="w-full bg-muted rounded-full h-3 overflow-hidden">
                 <div
-                  className="bg-gradient-to-r from-tessera-blue-500 to-tessera-cyan-500 h-2 rounded-full"
-                  style={{ width: "75%" }}
+                  className="h-3 rounded-full transition-all duration-500"
+                  style={{
+                    width: "75%",
+                    background: "linear-gradient(90deg, var(--primary), var(--accent))"
+                  }}
                 ></div>
               </div>
               <div className="flex justify-between text-xs text-muted-foreground">
-                <span>Aprobadas: 18</span>
-                <span>Rechazadas: 5</span>
+                <span className="flex items-center gap-1">
+                  <div className="w-2 h-2 rounded-full bg-green-500"></div>
+                  Aprobadas: 18
+                </span>
+                <span className="flex items-center gap-1">
+                  <div className="w-2 h-2 rounded-full bg-red-500"></div>
+                  Rechazadas: 5
+                </span>
               </div>
 
               <div className="pt-4 border-t">
                 <div className="flex items-center justify-between">
                   <span className="text-sm">Tiempo Promedio de Respuesta</span>
-                  <span className="font-medium">2.3 días</span>
+                  <span 
+                    className="font-medium"
+                    style={{ color: "var(--accent)" }}
+                  >
+                    2.3 días
+                  </span>
                 </div>
-                <div className="flex items-center gap-2 mt-1">
-                  <TrendingUp className="h-4 w-4 text-green-500" />
-                  <span className="text-xs text-green-600">15% mejor que el mes anterior</span>
+                <div className="flex items-center gap-2 mt-2 p-2 rounded-lg bg-green-50 dark:bg-green-900/20">
+                  <div 
+                    className="p-1 rounded-full"
+                    style={{
+                      background: "linear-gradient(135deg, var(--primary)/20, var(--accent)/20)"
+                    }}
+                  >
+                    <TrendingUp className="h-3 w-3 text-green-600 dark:text-green-400" />
+                  </div>
+                  <span className="text-xs text-green-600 dark:text-green-400 font-medium">
+                    15% mejor que el mes anterior
+                  </span>
                 </div>
               </div>
             </div>
           </CardContent>
         </Card>
       </div>
+
+      {/* Additional action section */}
+      <Card className="relative overflow-hidden backdrop-blur-sm bg-background/95 border shadow-lg">
+        <div 
+          className="absolute top-0 left-0 right-0 h-1"
+          style={{
+            background: "linear-gradient(90deg, var(--primary), var(--accent))"
+          }}
+        />
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <div 
+              className="p-2 rounded-lg"
+              style={{
+                background: "linear-gradient(135deg, var(--primary)/10, var(--accent)/10)"
+              }}
+            >
+              <AlertTriangle className="h-5 w-5" style={{ color: "var(--primary)" }} />
+            </div>
+            Acciones Pendientes
+          </CardTitle>
+          <CardDescription>
+            Tareas que requieren tu atención inmediata
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
+            <div className="p-4 rounded-lg border bg-muted/30 hover:bg-muted/50 transition-colors">
+              <div className="flex items-center gap-3">
+                <div className="p-2 rounded-full bg-orange-100 dark:bg-orange-900/30">
+                  <Building className="h-4 w-4 text-orange-600 dark:text-orange-400" />
+                </div>
+                <div>
+                  <p className="font-medium text-sm">Instituciones por revisar</p>
+                  <p className="text-xs text-muted-foreground">
+                    {stats.pendingInstitutions} solicitudes pendientes
+                  </p>
+                </div>
+              </div>
+            </div>
+            
+            <div className="p-4 rounded-lg border bg-muted/30 hover:bg-muted/50 transition-colors">
+              <div className="flex items-center gap-3">
+                <div className="p-2 rounded-full bg-blue-100 dark:bg-blue-900/30">
+                  <Users className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+                </div>
+                <div>
+                  <p className="font-medium text-sm">Usuarios por aprobar</p>
+                  <p className="text-xs text-muted-foreground">
+                    {stats.pendingUsers} usuarios en cola
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div className="p-4 rounded-lg border bg-muted/30 hover:bg-muted/50 transition-colors">
+              <div className="flex items-center gap-3">
+                <div 
+                  className="p-2 rounded-full"
+                  style={{
+                    background: "linear-gradient(135deg, var(--primary)/20, var(--accent)/20)"
+                  }}
+                >
+                  <CheckCircle className="h-4 w-4" style={{ color: "var(--primary)" }} />
+                </div>
+                <div>
+                  <p className="font-medium text-sm">Sistema actualizado</p>
+                  <p className="text-xs text-muted-foreground">
+                    Todas las funciones operativas
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   )
 }
