@@ -9,7 +9,9 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Upload, FileText, Download, Eye } from "lucide-react"
+import { CertificateTemplate } from "./certificate-template"
+import { Upload, Download, Maximize2 } from "lucide-react"
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 
 export function CreateCertificate() {
   const [formData, setFormData] = useState({
@@ -21,6 +23,7 @@ export function CreateCertificate() {
     expirationDate: "",
     template: "",
     additionalNotes: "",
+    institutionName: "Universidad XYZ",
   })
 
   const [templateFile, setTemplateFile] = useState<File | null>(null)
@@ -45,6 +48,13 @@ export function CreateCertificate() {
     alert("¡Certificado generado exitosamente! Se ha descontado 1 token.")
   }
 
+  const templateOptions = [
+    { value: "academic", label: "Certificado Académico", color: "Azul" },
+    { value: "completion", label: "Certificado de Finalización", color: "Verde" },
+    { value: "achievement", label: "Certificado de Logro", color: "Dorado" },
+    { value: "participation", label: "Certificado de Participación", color: "Púrpura" },
+  ]
+
   return (
     <div className="space-y-6">
       <div>
@@ -58,7 +68,7 @@ export function CreateCertificate() {
           <Card>
             <CardHeader>
               <CardTitle>Plantilla de Certificado</CardTitle>
-              <CardDescription>Sube tu plantilla personalizada o selecciona una predefinida</CardDescription>
+              <CardDescription>Selecciona el estilo de certificado que deseas usar</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid gap-4">
@@ -69,44 +79,19 @@ export function CreateCertificate() {
                       <SelectValue placeholder="Seleccionar plantilla" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="academic">Certificado Académico</SelectItem>
-                      <SelectItem value="completion">Certificado de Finalización</SelectItem>
-                      <SelectItem value="achievement">Certificado de Logro</SelectItem>
-                      <SelectItem value="participation">Certificado de Participación</SelectItem>
+                      {templateOptions.map((option) => (
+                        <SelectItem key={option.value} value={option.value}>
+                          <div className="flex items-center justify-between w-full">
+                            <span>{option.label}</span>
+                            <span className="text-xs text-muted-foreground ml-2">({option.color})</span>
+                          </div>
+                        </SelectItem>
+                      ))}
                     </SelectContent>
                   </Select>
                 </div>
 
-                <div className="text-center">
-                  <span className="text-sm text-muted-foreground">o</span>
-                </div>
-
-                <div>
-                  <Label htmlFor="template-upload">Subir Plantilla Personalizada</Label>
-                  <div className="mt-2 flex justify-center px-6 pt-5 pb-6 border-2 border-dashed border-muted-foreground/25 rounded-lg hover:border-muted-foreground/50 transition-colors">
-                    <div className="space-y-1 text-center">
-                      <Upload className="mx-auto h-12 w-12 text-muted-foreground" />
-                      <div className="flex text-sm text-muted-foreground">
-                        <label
-                          htmlFor="template-upload"
-                          className="relative cursor-pointer rounded-md font-medium text-primary hover:text-primary/80"
-                        >
-                          <span>Subir archivo</span>
-                          <input
-                            id="template-upload"
-                            type="file"
-                            className="sr-only"
-                            accept=".pdf,.png,.jpg,.jpeg"
-                            onChange={handleTemplateUpload}
-                          />
-                        </label>
-                        <p className="pl-1">o arrastra y suelta</p>
-                      </div>
-                      <p className="text-xs text-muted-foreground">PDF, PNG, JPG hasta 10MB</p>
-                      {templateFile && <p className="text-sm text-green-600 mt-2">✓ {templateFile.name}</p>}
-                    </div>
-                  </div>
-                </div>
+                
               </div>
             </CardContent>
           </Card>
@@ -189,6 +174,16 @@ export function CreateCertificate() {
               </div>
 
               <div>
+                <Label htmlFor="institution-name">Nombre de la Institución</Label>
+                <Input
+                  id="institution-name"
+                  value={formData.institutionName}
+                  onChange={(e) => handleInputChange("institutionName", e.target.value)}
+                  placeholder="Nombre de tu institución"
+                />
+              </div>
+
+              <div>
                 <Label htmlFor="additional-notes">Notas Adicionales</Label>
                 <Textarea
                   id="additional-notes"
@@ -206,26 +201,44 @@ export function CreateCertificate() {
         <div className="space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle>Vista Previa</CardTitle>
+              <CardTitle className="flex items-center justify-between">
+                Vista Previa
+                <Dialog>
+                  <DialogTrigger asChild>
+                    <Button variant="outline" size="sm" disabled={!formData.template && !templateFile}>
+                      <Maximize2 className="h-4 w-4" />
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent className="max-w-4xl">
+                    <DialogHeader>
+                      <DialogTitle>Vista Previa del Certificado</DialogTitle>
+                    </DialogHeader>
+                    <div className="p-4">
+                      <CertificateTemplate
+                        studentName={formData.studentName}
+                        certificateTitle={formData.certificateTitle}
+                        description={formData.description}
+                        issueDate={formData.issueDate}
+                        institutionName={formData.institutionName}
+                        template={formData.template}
+                        additionalNotes={formData.additionalNotes}
+                      />
+                    </div>
+                  </DialogContent>
+                </Dialog>
+              </CardTitle>
               <CardDescription>Previsualiza cómo se verá tu certificado</CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="aspect-[4/3] bg-muted rounded-lg flex items-center justify-center border-2 border-dashed">
-                <div className="text-center space-y-2">
-                  <FileText className="mx-auto h-12 w-12 text-muted-foreground" />
-                  <p className="text-sm text-muted-foreground">
-                    {formData.template || templateFile ? "Vista previa disponible" : "Selecciona una plantilla"}
-                  </p>
-                </div>
-              </div>
-              <Button
-                variant="outline"
-                className="w-full mt-4 bg-transparent"
-                disabled={!formData.template && !templateFile}
-              >
-                <Eye className="mr-2 h-4 w-4" />
-                Vista Previa Completa
-              </Button>
+              <CertificateTemplate
+                studentName={formData.studentName}
+                certificateTitle={formData.certificateTitle}
+                description={formData.description}
+                issueDate={formData.issueDate}
+                institutionName={formData.institutionName}
+                template={formData.template}
+                additionalNotes={formData.additionalNotes}
+              />
             </CardContent>
           </Card>
 
