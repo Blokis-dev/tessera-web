@@ -1,10 +1,12 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
+import * as htmlToImage from "html-to-image"
 import { Button } from "@/components/ui/button"
 import { Dialog, DialogContent } from "@/components/ui/dialog"
 import { Badge } from "@/components/ui/badge"
 import { CheckCircle, X, Shield, Calendar, User, Building, Download, Share } from "lucide-react"
+import { CertificateTemplate } from "@/components/dashboard/certificate-template"
 
 interface VerificationModalProps {
   isOpen: boolean
@@ -29,15 +31,14 @@ export function VerificationModal({ isOpen, onClose, token }: VerificationModalP
   const [isLoading, setIsLoading] = useState(true)
   const [certificateData, setCertificateData] = useState<CertificateData | null>(null)
   const [error, setError] = useState<string | null>(null)
+  const certificateRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     if (isOpen && token) {
-      // Simular llamada a API
       setIsLoading(true)
       setError(null)
 
       setTimeout(() => {
-        // Simular respuesta de la API
         if (token.startsWith("TSR-") || token.length > 5) {
           setCertificateData({
             id: "cert-001",
@@ -75,6 +76,21 @@ export function VerificationModal({ isOpen, onClose, token }: VerificationModalP
         return <Badge className="bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300">Inválido</Badge>
       default:
         return <Badge>Desconocido</Badge>
+    }
+  }
+
+  // Función para descargar imagen
+  const handleDownloadImage = async () => {
+    if (certificateRef.current) {
+      try {
+        const dataUrl = await htmlToImage.toPng(certificateRef.current)
+        const link = document.createElement("a")
+        link.download = "certificado.png"
+        link.href = dataUrl
+        link.click()
+      } catch (error) {
+        alert("Ocurrió un error al generar la imagen.")
+      }
     }
   }
 
@@ -120,33 +136,22 @@ export function VerificationModal({ isOpen, onClose, token }: VerificationModalP
               </div>
             </div>
 
-            {/* Certificate Content */}
-            <div className="bg-gradient-to-br from-tessera-blue-50 to-tessera-cyan-50 dark:from-tessera-blue-950/20 dark:to-tessera-cyan-950/20 rounded-lg p-6 border">
-              <div className="text-center space-y-4">
-                <div className="flex justify-center">
-                  <img
-                    src={certificateData.institutionLogo || "/placeholder.svg"}
-                    alt="Logo institución"
-                    className="h-16 w-16 rounded-full border-2 border-background"
-                  />
-                </div>
-
-                <div>
-                  <h3 className="text-2xl font-bold text-tessera-blue-700 dark:text-tessera-blue-300">
-                    {certificateData.certificateTitle}
-                  </h3>
-                  <p className="text-lg mt-2">
-                    Se certifica que <span className="font-semibold">{certificateData.studentName}</span>
-                  </p>
-                  <p className="text-sm text-muted-foreground mt-2">{certificateData.description}</p>
-                </div>
-
-                <div className="flex justify-center">
-                  <div className="text-center">
-                    <p className="text-sm text-muted-foreground">Emitido por</p>
-                    <p className="font-semibold">{certificateData.institutionName}</p>
-                  </div>
-                </div>
+            {/* Vista previa del certificado con template verde */}
+            <div className="flex justify-center">
+              <div ref={certificateRef}>
+                <CertificateTemplate
+                  studentName={certificateData.studentName}
+                  certificateTitle={certificateData.certificateTitle}
+                  description={certificateData.description}
+                  issueDate={certificateData.issueDate}
+                  institutionName={certificateData.institutionName}
+                  template="completion"
+                  additionalNotes={
+                    certificateData.expirationDate
+                      ? `Válido hasta: ${new Date(certificateData.expirationDate).toLocaleDateString("es-ES")}`
+                      : undefined
+                  }
+                />
               </div>
             </div>
 
@@ -218,9 +223,13 @@ export function VerificationModal({ isOpen, onClose, token }: VerificationModalP
 
             {/* Actions */}
             <div className="flex flex-col sm:flex-row gap-2 pt-4 border-t">
-              <Button variant="outline" className="flex-1 bg-transparent">
+              <Button
+                variant="outline"
+                className="flex-1 bg-transparent"
+                onClick={handleDownloadImage}
+              >
                 <Download className="mr-2 h-4 w-4" />
-                Descargar PDF
+                Descargar Imagen
               </Button>
               <Button variant="outline" className="flex-1 bg-transparent">
                 <Share className="mr-2 h-4 w-4" />

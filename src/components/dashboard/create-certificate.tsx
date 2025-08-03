@@ -1,8 +1,8 @@
 "use client"
 
 import type React from "react"
-
-import { useState } from "react"
+import { useState, useRef } from "react"
+import * as htmlToImage from "html-to-image"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -12,6 +12,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { CertificateTemplate } from "./certificate-template"
 import { Upload, Download, Maximize2 } from "lucide-react"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
+import { useToast } from "@/components/ui/use-toast"
 
 export function CreateCertificate() {
   const [formData, setFormData] = useState({
@@ -28,6 +29,8 @@ export function CreateCertificate() {
 
   const [templateFile, setTemplateFile] = useState<File | null>(null)
   const [isGenerating, setIsGenerating] = useState(false)
+  const certificateRef = useRef<HTMLDivElement>(null)
+  const { toast } = useToast()
 
   const handleInputChange = (field: string, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }))
@@ -42,10 +45,29 @@ export function CreateCertificate() {
 
   const handleGenerateCertificate = async () => {
     setIsGenerating(true)
-    // Simular generación de certificado
-    await new Promise((resolve) => setTimeout(resolve, 2000))
-    setIsGenerating(false)
-    alert("¡Certificado generado exitosamente! Se ha descontado 1 token.")
+    setTimeout(async () => {
+      if (certificateRef.current) {
+        try {
+          const dataUrl = await htmlToImage.toPng(certificateRef.current)
+          const link = document.createElement("a")
+          link.download = "certificado.png"
+          link.href = dataUrl
+          link.click()
+          toast({
+            title: "¡Certificado generado!",
+            description: "El certificado se descargó correctamente y se descontó 1 token.",
+            variant: "success",
+          })
+        } catch (error) {
+          toast({
+            title: "Error",
+            description: "Ocurrió un error al generar la imagen.",
+            variant: "destructive",
+          })
+        }
+      }
+      setIsGenerating(false)
+    }, 500)
   }
 
   const templateOptions = [
@@ -90,8 +112,6 @@ export function CreateCertificate() {
                     </SelectContent>
                   </Select>
                 </div>
-
-                
               </div>
             </CardContent>
           </Card>
@@ -230,15 +250,18 @@ export function CreateCertificate() {
               <CardDescription>Previsualiza cómo se verá tu certificado</CardDescription>
             </CardHeader>
             <CardContent>
-              <CertificateTemplate
-                studentName={formData.studentName}
-                certificateTitle={formData.certificateTitle}
-                description={formData.description}
-                issueDate={formData.issueDate}
-                institutionName={formData.institutionName}
-                template={formData.template}
-                additionalNotes={formData.additionalNotes}
-              />
+              {/* Aquí agregamos el ref para exportar la imagen */}
+              <div ref={certificateRef}>
+                <CertificateTemplate
+                  studentName={formData.studentName}
+                  certificateTitle={formData.certificateTitle}
+                  description={formData.description}
+                  issueDate={formData.issueDate}
+                  institutionName={formData.institutionName}
+                  template={formData.template}
+                  additionalNotes={formData.additionalNotes}
+                />
+              </div>
             </CardContent>
           </Card>
 
