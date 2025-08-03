@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button"
 import { ThemeToggle } from "@/components/theme-toggle"
 import { Home, FileText, User, Settings, LogOut, Shield, Menu, X, Plus, BarChart3 } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { useAuth } from "@/lib/auth-context"
 
 interface SidebarProps {
   activeTab: string
@@ -22,6 +23,7 @@ const navigation = [
 
 export function Sidebar({ activeTab, onTabChange }: SidebarProps) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+  const { logout, user } = useAuth()
 
   return (
     <>
@@ -82,6 +84,7 @@ export function Sidebar({ activeTab, onTabChange }: SidebarProps) {
             <Button
               variant="ghost"
               className="w-full justify-start text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-950"
+              onClick={logout}
             >
               <LogOut className="mr-3 h-4 w-4" />
               Cerrar Sesión

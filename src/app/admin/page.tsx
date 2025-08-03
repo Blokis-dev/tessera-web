@@ -5,6 +5,7 @@ import { AdminSidebar } from "@/components/admin/admin-sidebar"
 import { AdminDashboard } from "@/components/admin/admin-dashboard"
 import { SolicitudesList } from "@/components/admin/solicitudes-list"
 import { SolicitudDetails } from "@/components/admin/solicitud-details"
+import { ProtectedRoute } from "@/components/protected-route"
 
 export default function AdminPage() {
   const [activeTab, setActiveTab] = useState("dashboard")
@@ -66,11 +67,13 @@ export default function AdminPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      <AdminSidebar activeTab={activeTab} onTabChange={setActiveTab} />
-      <div className="lg:pl-64">
-        <main className="p-6 lg:p-8">{renderContent()}</main>
+    <ProtectedRoute requiredRole="admin">
+      <div className="min-h-screen bg-background">
+        <AdminSidebar activeTab={activeTab} onTabChange={setActiveTab} />
+        <div className="lg:pl-64">
+          <main className="p-6 lg:p-8">{renderContent()}</main>
+        </div>
       </div>
-    </div>
+    </ProtectedRoute>
   )
 }

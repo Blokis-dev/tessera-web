@@ -8,9 +8,8 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
-import { Shield, ArrowLeft, Upload } from "lucide-react"
+import { Shield, ArrowLeft, Upload, AlertCircle } from "lucide-react"
 import { ThemeToggle } from "@/components/theme-toggle"
 
 interface PersonalData {
@@ -31,10 +30,11 @@ interface InstitutionData {
 export default function RegisterForm() {
     const [step, setStep] = useState(1)
     const [isLoading, setIsLoading] = useState(false)
+    const [error, setError] = useState("")
     const [personalData, setPersonalData] = useState<PersonalData>({
         fullName: "",
         email: "",
-        role: "",
+        role: "owner", // Por defecto será propietario de institución
     })
     const [institutionData, setInstitutionData] = useState<InstitutionData>({
         institutionName: "",
@@ -47,7 +47,8 @@ export default function RegisterForm() {
 
     const handlePersonalSubmit = (e: React.FormEvent) => {
         e.preventDefault()
-        if (personalData.fullName && personalData.email && personalData.role) {
+        setError("") // Limpiar errores previos
+        if (personalData.fullName && personalData.email) {
             setStep(2)
         }
     }
@@ -55,15 +56,44 @@ export default function RegisterForm() {
     const handleInstitutionSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
         setIsLoading(true)
-        // Aquí implementarías la lógica de registro
-        console.log("Datos personales:", personalData)
-        console.log("Datos institucionales:", institutionData)
+        setError("") // Limpiar errores previos
 
-        // Simular llamada a la API
-        setTimeout(() => {
+        try {
+            const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL
+            
+            const requestData = {
+                name: institutionData.institutionName,
+                legal_id: institutionData.legalId,
+                email_institucional: institutionData.institutionalEmail,
+                owner_email: personalData.email,
+                owner_full_name: personalData.fullName,
+                website: institutionData.website || undefined,
+                description: institutionData.description || undefined
+            }
+
+            const response = await fetch(`${baseUrl}/companies/create-with-owner`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                credentials: 'include',
+                body: JSON.stringify(requestData)
+            })
+
+            const responseData = await response.json()
+
+            if (response.ok) {
+                setStep(3) // Cambiar al paso de confirmación
+            } else {
+                console.error("Error en el registro:", responseData)
+                setError(responseData.message || 'Error al crear la cuenta')
+            }
+        } catch (error) {
+            console.error("Error de conexión:", error)
+            setError('Error de conexión. Por favor intenta de nuevo.')
+        } finally {
             setIsLoading(false)
-            setStep(3) // Cambiar al paso de confirmación
-        }, 2000)
+        }
     }
 
     const handleLogoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -138,19 +168,14 @@ export default function RegisterForm() {
 
                                 <div className="space-y-2">
                                     <Label htmlFor="role">Rol</Label>
-                                    <Select
-                                        value={personalData.role}
-                                        onValueChange={(value) => setPersonalData((prev) => ({ ...prev, role: value }))}
-                                    >
-                                        <SelectTrigger className="focus:ring-emerald-500 focus:border-emerald-500">
-                                            <SelectValue placeholder="Selecciona tu rol" />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                            <SelectItem value="estudiante">Estudiante</SelectItem>
-                                            <SelectItem value="institucion">Institución</SelectItem>
-                                            <SelectItem value="admin">Administrador</SelectItem>
-                                        </SelectContent>
-                                    </Select>
+                                    <div className="p-2 bg-gray-50 dark:bg-gray-800 rounded-md border">
+                                        <p className="text-sm text-gray-600 dark:text-gray-400">
+                                            Propietario de Institución
+                                        </p>
+                                    </div>
+                                    <p className="text-xs text-gray-500 dark:text-gray-400">
+                                        Se te asignará automáticamente como propietario de la institución que registres
+                                    </p>
                                 </div>
 
                                 <Button type="submit" className="w-full bg-emerald-600 hover:bg-emerald-700">
@@ -159,6 +184,13 @@ export default function RegisterForm() {
                             </form>
                         ) : step === 2 ? (
                             <form onSubmit={handleInstitutionSubmit} className="space-y-4">
+                                {error && (
+                                    <div className="mb-4 p-3 text-sm text-red-800 bg-red-100 border border-red-200 rounded-md dark:bg-red-900/20 dark:text-red-400 dark:border-red-800 flex items-center gap-2">
+                                        <AlertCircle className="h-4 w-4" />
+                                        {error}
+                                    </div>
+                                )}
+
                                 <div className="space-y-2">
                                     <Label htmlFor="institutionName">Nombre de la Institución</Label>
                                     <Input
@@ -249,7 +281,6 @@ export default function RegisterForm() {
                                 </div>
                             </form>
                         ) : (
-                            // Paso 3: Pantalla de confirmación
                             <div className="text-center space-y-6 py-8">
                                 <div className="mx-auto p-4 bg-emerald-100 dark:bg-emerald-900 rounded-full w-fit">
                                     <Shield className="h-12 w-12 text-emerald-600 dark:text-emerald-400" />
@@ -273,7 +304,7 @@ export default function RegisterForm() {
                         {step < 3 && (
                             <div className="mt-6 text-center text-sm">
                                 <span className="text-gray-600 dark:text-gray-400">¿Ya tienes una cuenta? </span>
-                                <Link href="/login" className="text-teal-600 hover:text-teal-700 font-medium">
+                                <Link href="/auth/login" className="text-teal-600 hover:text-teal-700 font-medium">
                                     Inicia sesión aquí
                                 </Link>
                             </div>

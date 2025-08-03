@@ -17,25 +17,28 @@ import { CheckCircle, XCircle } from "lucide-react"
 interface ApprovalModalProps {
   isOpen: boolean
   onClose: () => void
-  action: "aprobar" | "rechazar" | null
+  actionType: "approve" | "reject"
   institutionName: string
-  onConfirm: (comments: string) => void
+  userName?: string
+  onConfirm: (status: "verified" | "rejected", notes: string) => void
 }
 
-export function ApprovalModal({ isOpen, onClose, action, institutionName, onConfirm }: ApprovalModalProps) {
+export function ApprovalModal({ isOpen, onClose, actionType, institutionName, userName, onConfirm }: ApprovalModalProps) {
   const [comments, setComments] = useState("")
   const [isSubmitting, setIsSubmitting] = useState(false)
 
   const handleSubmit = async () => {
     setIsSubmitting(true)
-    await new Promise((resolve) => setTimeout(resolve, 1000)) // Simular API call
-    onConfirm(comments)
+    const status = actionType === "approve" ? "verified" : "rejected"
+    onConfirm(status, comments)
     setComments("")
     setIsSubmitting(false)
     onClose()
   }
 
-  const isApproval = action === "aprobar"
+  const isApproval = actionType === "approve"
+
+  const displayName = userName || institutionName
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -51,7 +54,7 @@ export function ApprovalModal({ isOpen, onClose, action, institutionName, onConf
           </DialogTitle>
           <DialogDescription>
             ¿Estás seguro de que deseas {isApproval ? "aprobar" : "rechazar"} la solicitud de{" "}
-            <span className="font-medium">{institutionName}</span>?
+            <span className="font-medium">{displayName}</span>?
           </DialogDescription>
         </DialogHeader>
 

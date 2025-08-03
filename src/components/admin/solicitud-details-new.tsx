@@ -67,31 +67,46 @@ export function SolicitudDetails({ solicitudId, onBack }: SolicitudDetailsProps)
     try {
       const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL
       
-      // Ahora solo manejamos usuarios ya que las instituciones se crean atomicamente
+      // Determinar el tipo y ID real de la solicitud
       const [type, realId] = solicitudId.split('_')
       
-      if (type !== 'user') {
-        throw new Error('Solo se pueden ver detalles de usuarios pendientes')
-      }
+      let data: SolicitudDetails
       
-      // Obtener la lista de usuarios pendientes y encontrar el específico
-      const response = await fetch(`${baseUrl}/admin/users/pending`, {
-        credentials: 'include'
-      })
-      
-      if (response.ok) {
-        const users = await response.json()
-        const user = users.find((u: UserDetails) => u.id === realId)
+      if (type === 'inst') {
+        // Obtener detalles de institución
+        const response = await fetch(`${baseUrl}/companies/${realId}`, {
+          credentials: 'include'
+        })
         
-        if (user) {
-          const data: SolicitudDetails = { type: 'user', user }
-          setSolicitud(data)
+        if (response.ok) {
+          const institution = await response.json()
+          data = { type: 'institution', institution }
         } else {
-          throw new Error('Usuario no encontrado')
+          throw new Error('Error al cargar detalles de la institución')
+        }
+      } else if (type === 'user') {
+        // Para usuarios necesitamos obtener el email primero, así que usaremos la lista de usuarios pendientes
+        const response = await fetch(`${baseUrl}/admin/users/pending`, {
+          credentials: 'include'
+        })
+        
+        if (response.ok) {
+          const users = await response.json()
+          const user = users.find((u: UserDetails) => u.id === realId)
+          
+          if (user) {
+            data = { type: 'user', user }
+          } else {
+            throw new Error('Usuario no encontrado')
+          }
+        } else {
+          throw new Error('Error al cargar detalles del usuario')
         }
       } else {
-        throw new Error('Error al cargar detalles del usuario')
+        throw new Error('Tipo de solicitud no válido')
       }
+      
+      setSolicitud(data)
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Error desconocido')
       console.error('Error fetching solicitud details:', err)
@@ -105,15 +120,23 @@ export function SolicitudDetails({ solicitudId, onBack }: SolicitudDetailsProps)
       const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL
       const [type, realId] = solicitudId.split('_')
       
-      if (type !== 'user' || !solicitud?.user) {
-        throw new Error('Solo se pueden aprobar usuarios')
-      }
+      let endpoint = ''
+      let body = {}
       
-      const endpoint = `${baseUrl}/admin/users/approve`
-      const body = {
-        userId: realId,
-        status,
-        adminNotes: notes
+      if (type === 'inst' && solicitud?.institution) {
+        endpoint = `${baseUrl}/admin/institutions/approve`
+        body = {
+          institutionId: realId,
+          status,
+          adminNotes: notes
+        }
+      } else if (type === 'user' && solicitud?.user) {
+        endpoint = `${baseUrl}/admin/users/approve`
+        body = {
+          userId: realId,
+          status,
+          adminNotes: notes
+        }
       }
       
       const response = await fetch(endpoint, {
@@ -127,14 +150,23 @@ export function SolicitudDetails({ solicitudId, onBack }: SolicitudDetailsProps)
       
       if (response.ok) {
         // Actualizar el estado local
-        setSolicitud({
-          ...solicitud,
-          user: { ...solicitud.user, status }
-        })
+        if (solicitud) {
+          if (solicitud.institution) {
+            setSolicitud({
+              ...solicitud,
+              institution: { ...solicitud.institution, status }
+            })
+          } else if (solicitud.user) {
+            setSolicitud({
+              ...solicitud,
+              user: { ...solicitud.user, status }
+            })
+          }
+        }
         
         setIsApprovalModalOpen(false)
         
-        // Regresar a la lista después de un tiempo
+        // Opcional: regresar a la lista después de un tiempo
         setTimeout(() => {
           onBack()
         }, 2000)
@@ -149,15 +181,12 @@ export function SolicitudDetails({ solicitudId, onBack }: SolicitudDetailsProps)
   }
 
   const getInitials = (name: string) => {
-    if (!name || typeof name !== 'string') return 'N/A'
-    
     return name
       .split(' ')
       .map(word => word[0])
-      .filter(Boolean)
       .join('')
       .toUpperCase()
-      .slice(0, 2) || 'N/A'
+      .slice(0, 2)
   }
 
   const getStatusBadge = (status: string) => {
@@ -202,7 +231,7 @@ export function SolicitudDetails({ solicitudId, onBack }: SolicitudDetailsProps)
     )
   }
 
-  const currentStatus = solicitud.user?.status || 'pending'
+  const currentStatus = solicitud.institution?.status || solicitud.user?.status || 'pending'
   const isEditable = currentStatus === 'pending'
 
   return (
@@ -246,6 +275,80 @@ export function SolicitudDetails({ solicitudId, onBack }: SolicitudDetailsProps)
       <div className="grid gap-6 lg:grid-cols-3">
         {/* Información principal */}
         <div className="lg:col-span-2 space-y-6">
+          {solicitud.type === 'institution' && solicitud.institution && (
+            <>
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Building className="h-5 w-5" />
+                    Información de la Institución
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="grid gap-4 md:grid-cols-2">
+                    <div>
+                      <label className="text-sm font-medium text-muted-foreground">Nombre</label>
+                      <p className="font-medium">{solicitud.institution.name}</p>
+                    </div>
+                    <div>
+                      <label className="text-sm font-medium text-muted-foreground">NIT / ID Legal</label>
+                      <p className="font-medium">{solicitud.institution.legal_id}</p>
+                    </div>
+                  </div>
+
+                  <div className="grid gap-4 md:grid-cols-2">
+                    <div>
+                      <label className="text-sm font-medium text-muted-foreground">Email Institucional</label>
+                      <div className="flex items-center gap-2">
+                        <Mail className="h-4 w-4 text-muted-foreground" />
+                        <p>{solicitud.institution.email_institucional}</p>
+                      </div>
+                    </div>
+                    {solicitud.institution.website && (
+                      <div>
+                        <label className="text-sm font-medium text-muted-foreground">Sitio Web</label>
+                        <div className="flex items-center gap-2">
+                          <Globe className="h-4 w-4 text-muted-foreground" />
+                          <a 
+                            href={solicitud.institution.website} 
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                            className="text-blue-600 hover:underline"
+                          >
+                            {solicitud.institution.website}
+                          </a>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  {solicitud.institution.description && (
+                    <div>
+                      <label className="text-sm font-medium text-muted-foreground">Descripción</label>
+                      <p className="mt-1 text-sm leading-relaxed">{solicitud.institution.description}</p>
+                    </div>
+                  )}
+
+                  <div>
+                    <label className="text-sm font-medium text-muted-foreground">Fecha de Solicitud</label>
+                    <div className="flex items-center gap-2">
+                      <Calendar className="h-4 w-4 text-muted-foreground" />
+                      <p>
+                        {new Date(solicitud.institution.created_at).toLocaleDateString('es-ES', {
+                          year: 'numeric',
+                          month: 'long',
+                          day: 'numeric',
+                          hour: '2-digit',
+                          minute: '2-digit'
+                        })}
+                      </p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </>
+          )}
+
           {solicitud.type === 'user' && solicitud.user && (
             <>
               <Card>
@@ -277,10 +380,7 @@ export function SolicitudDetails({ solicitudId, onBack }: SolicitudDetailsProps)
                     </div>
                     <div>
                       <label className="text-sm font-medium text-muted-foreground">Institución</label>
-                      <div className="flex items-center gap-2">
-                        <Building className="h-4 w-4 text-muted-foreground" />
-                        <p className="font-medium">{solicitud.user.institution_name}</p>
-                      </div>
+                      <p className="font-medium">{solicitud.user.institution_name}</p>
                     </div>
                   </div>
 
@@ -315,15 +415,23 @@ export function SolicitudDetails({ solicitudId, onBack }: SolicitudDetailsProps)
               <div className="flex flex-col items-center space-y-4">
                 <Avatar className="h-20 w-20">
                   <AvatarFallback className="text-lg bg-gradient-to-r from-blue-500 to-purple-500 text-white">
-                    {solicitud.user ? getInitials(solicitud.user.full_name) : 'N/A'}
+                    {solicitud.type === 'institution' && solicitud.institution 
+                      ? getInitials(solicitud.institution.name)
+                      : solicitud.user 
+                      ? getInitials(solicitud.user.full_name)
+                      : 'N/A'
+                    }
                   </AvatarFallback>
                 </Avatar>
                 <div className="text-center">
                   <p className="font-medium">
-                    {solicitud.user?.full_name || 'N/A'}
+                    {solicitud.type === 'institution' && solicitud.institution 
+                      ? solicitud.institution.name
+                      : solicitud.user?.full_name
+                    }
                   </p>
                   <p className="text-sm text-muted-foreground">
-                    Usuario - {solicitud.user?.institution_name || 'Sin institución'}
+                    {solicitud.type === 'institution' ? 'Institución' : 'Usuario'}
                   </p>
                 </div>
               </div>
@@ -337,7 +445,9 @@ export function SolicitudDetails({ solicitudId, onBack }: SolicitudDetailsProps)
             <CardContent className="space-y-3">
               <div className="flex justify-between items-center py-2 border-b">
                 <span className="text-sm text-muted-foreground">Tipo</span>
-                <span className="text-sm font-medium">Usuario y Institución</span>
+                <span className="text-sm font-medium">
+                  {solicitud.type === 'institution' ? 'Institución' : 'Usuario'}
+                </span>
               </div>
               <div className="flex justify-between items-center py-2 border-b">
                 <span className="text-sm text-muted-foreground">Estado</span>
@@ -346,7 +456,9 @@ export function SolicitudDetails({ solicitudId, onBack }: SolicitudDetailsProps)
               <div className="flex justify-between items-center py-2">
                 <span className="text-sm text-muted-foreground">Fecha</span>
                 <span className="text-sm font-medium">
-                  {new Date(solicitud.user?.created_at || '').toLocaleDateString('es-ES', { 
+                  {new Date(
+                    solicitud.institution?.created_at || solicitud.user?.created_at || ''
+                  ).toLocaleDateString('es-ES', { 
                     month: 'short', 
                     day: 'numeric' 
                   })}
@@ -363,8 +475,16 @@ export function SolicitudDetails({ solicitudId, onBack }: SolicitudDetailsProps)
         onClose={() => setIsApprovalModalOpen(false)}
         onConfirm={handleApproval}
         actionType={actionType}
-        institutionName={solicitud.user?.institution_name || 'N/A'}
-        userName={solicitud.user?.full_name || 'N/A'}
+        institutionName={
+          solicitud.type === 'institution' && solicitud.institution 
+            ? solicitud.institution.name
+            : solicitud.user?.institution_name || 'N/A'
+        }
+        userName={
+          solicitud.type === 'user' && solicitud.user 
+            ? solicitud.user.full_name
+            : 'N/A'
+        }
       />
     </div>
   )

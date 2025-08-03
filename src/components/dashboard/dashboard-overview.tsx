@@ -4,12 +4,15 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button"
 import { StatsCard } from "./stats-card"
 import { Coins, FileText, CheckCircle, TrendingUp, Plus, Eye } from "lucide-react"
+import { useAuth } from "@/lib/auth-context"
 
 interface DashboardOverviewProps {
   onTabChange: (tab: string) => void
 }
 
 export function DashboardOverview({ onTabChange }: DashboardOverviewProps) {
+  const { user } = useAuth()
+  
   // Datos simulados - en una app real vendrían de una API
   const stats = {
     tokensAvailable: 42,
@@ -42,11 +45,13 @@ export function DashboardOverview({ onTabChange }: DashboardOverviewProps) {
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
           <h1 className="text-3xl font-bold">Dashboard</h1>
-          <p className="text-muted-foreground">Bienvenido de vuelta, Universidad XYZ</p>
+          <p className="text-muted-foreground">
+            Bienvenido de vuelta, {user?.institution_name || user?.full_name}
+          </p>
         </div>
         <Button
           onClick={() => onTabChange("create")}
-          className="bg-gradient-to-r from-tessera-blue-500 to-tessera-cyan-500 hover:from-tessera-blue-600 hover:to-tessera-cyan-600"
+          className="bg-gradient-to-r from-teal-500 to-cyan-500 hover:from-teal-600 hover:to-cyan-600"
         >
           <Plus className="mr-2 h-4 w-4" />
           Crear Certificado

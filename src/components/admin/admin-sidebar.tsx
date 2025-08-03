@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button"
 import { ThemeToggle } from "@/components/theme-toggle"
 import { Home, Users, Building, Settings, LogOut, Shield, Menu, X, BarChart3 } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { useAuth } from "@/lib/auth-context"
 
 interface AdminSidebarProps {
   activeTab: string
@@ -22,6 +23,7 @@ const navigation = [
 
 export function AdminSidebar({ activeTab, onTabChange }: AdminSidebarProps) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+  const { logout, user } = useAuth()
 
   return (
     <>
@@ -90,6 +92,7 @@ export function AdminSidebar({ activeTab, onTabChange }: AdminSidebarProps) {
             <Button
               variant="ghost"
               className="w-full justify-start text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-950"
+              onClick={logout}
             >
               <LogOut className="mr-3 h-4 w-4" />
               Cerrar Sesión

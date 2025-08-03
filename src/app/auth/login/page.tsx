@@ -3,6 +3,7 @@
 import type React from "react"
 
 import { useState } from "react"
+import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -10,16 +11,71 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Shield, Eye, EyeOff } from "lucide-react"
 import { ThemeToggle } from "@/components/theme-toggle"
+import { useAuth } from "@/lib/auth-context"
 
 export default function LoginForm() {
     const [showPassword, setShowPassword] = useState(false)
     const [isLoading, setIsLoading] = useState(false)
+    const [error, setError] = useState("")
+    const [formData, setFormData] = useState({
+        email: "",
+        password: ""
+    })
+    const router = useRouter()
+    const { login } = useAuth()
+
+    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const { name, value } = e.target
+        setFormData(prev => ({
+            ...prev,
+            [name]: value
+        }))
+        // Limpiar error cuando el usuario empiece a escribir
+        if (error) setError("")
+    }
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
         setIsLoading(true)
-        // Aquí implementarías la lógica de login
-        setTimeout(() => setIsLoading(false), 2000)
+        setError("")
+
+        try {
+            const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL
+            const response = await fetch(`${baseUrl}/auth/login`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                credentials: 'include', // Importante: incluir cookies
+                body: JSON.stringify({
+                    email: formData.email,
+                    password: formData.password
+                })
+            })
+
+            const data = await response.json()
+
+            if (response.ok) {
+                // Login exitoso - las cookies se establecen automáticamente
+                const user = data.user
+                
+                // Actualizar el contexto de autenticación
+                login(user)
+                
+                // La redirección se manejará automáticamente por el AuthProvider
+            } else if (response.status === 403 && data.error === 'REDIRECT_TO_FIRST_TIME_LOGIN') {
+                // Usuario necesita cambiar contraseña en primer login
+                router.push(`/auth/first-time-login?email=${encodeURIComponent(formData.email)}`)
+            } else {
+                // Error de credenciales u otro error
+                setError(data.message || 'Error al iniciar sesión')
+            }
+        } catch (err) {
+            setError('Error de conexión. Por favor intenta de nuevo.')
+            console.error('Login error:', err)
+        } finally {
+            setIsLoading(false)
+        }
     }
 
     return (
@@ -38,13 +94,21 @@ export default function LoginForm() {
                         <CardDescription>Ingresa tus credenciales para acceder al sistema</CardDescription>
                     </CardHeader>
                     <CardContent>
+                        {error && (
+                            <div className="mb-4 p-3 text-sm text-red-800 bg-red-100 border border-red-200 rounded-md dark:bg-red-900/20 dark:text-red-400 dark:border-red-800">
+                                {error}
+                            </div>
+                        )}
                         <form onSubmit={handleSubmit} className="space-y-4">
                             <div className="space-y-2">
                                 <Label htmlFor="email">Correo Electrónico</Label>
                                 <Input
                                     id="email"
+                                    name="email"
                                     type="email"
                                     placeholder="tu@email.com"
+                                    value={formData.email}
+                                    onChange={handleInputChange}
                                     required
                                     className="focus:ring-teal-500 focus:border-teal-500"
                                 />
@@ -55,8 +119,11 @@ export default function LoginForm() {
                                 <div className="relative">
                                     <Input
                                         id="password"
+                                        name="password"
                                         type={showPassword ? "text" : "password"}
                                         placeholder="••••••••"
+                                        value={formData.password}
+                                        onChange={handleInputChange}
                                         required
                                         className="focus:ring-teal-500 focus:border-teal-500 pr-10"
                                     />

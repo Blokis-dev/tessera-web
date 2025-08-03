@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Eye, Search, Filter, Calendar, Building, Mail, Phone, Loader2, AlertCircle, User } from "lucide-react"
+import { Eye, Search, Filter, Calendar, Building, Mail, Phone, Loader2, AlertCircle } from "lucide-react"
 
 interface SolicitudesListProps {
   onViewDetails: (id: string) => void
@@ -60,60 +60,40 @@ export function SolicitudesList({ onViewDetails }: SolicitudesListProps) {
     try {
       const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL
       
-      if (!baseUrl) {
-        throw new Error('API base URL no configurado')
-      }
-      
       const [institutionsResponse, usersResponse] = await Promise.all([
         fetch(`${baseUrl}/admin/institutions/pending`, { credentials: 'include' }),
         fetch(`${baseUrl}/admin/users/pending`, { credentials: 'include' })
       ])
 
-      let institutions: PendingInstitution[] = []
-      let users: PendingUser[] = []
-      
-      if (institutionsResponse.ok) {
-        try {
-          institutions = await institutionsResponse.json()
-          if (!Array.isArray(institutions)) {
-            institutions = []
-          }
-        } catch (err) {
-          console.error('Error parsing institutions response:', err)
-          institutions = []
-        }
-      }
-      
-      if (usersResponse.ok) {
-        try {
-          users = await usersResponse.json()
-          if (!Array.isArray(users)) {
-            users = []
-          }
-        } catch (err) {
-          console.error('Error parsing users response:', err)
-          users = []
-        }
-      }
+      const institutions: PendingInstitution[] = institutionsResponse.ok ? await institutionsResponse.json() : []
+      const users: PendingUser[] = usersResponse.ok ? await usersResponse.json() : []
 
+      // Combinar instituciones y usuarios en una lista unificada
       const combined: CombinedSolicitud[] = [
-        ...users.map(user => {
-          if (!user.id) {
-            console.warn('User without ID found:', user)
-          }
-          return {
-            id: `user_${user.id || 'unknown'}`,
-            type: 'user' as const,
-            userName: user.full_name || 'Sin nombre',
-            institutionName: user.institution_name || 'Sin institución',
-            email: user.email || 'Sin email',
-            status: user.status || 'pending',
-            createdAt: user.created_at || new Date().toISOString(),
-            user: user
-          }
-        })
+        ...institutions.map(inst => ({
+          id: `inst_${inst.id}`,
+          type: 'institution' as const,
+          userName: 'Pendiente de asignación',
+          institutionName: inst.name,
+          email: inst.email_institucional,
+          status: inst.status,
+          createdAt: inst.created_at,
+          legalId: inst.legal_id,
+          institution: inst
+        })),
+        ...users.map(user => ({
+          id: `user_${user.id}`,
+          type: 'user' as const,
+          userName: user.full_name,
+          institutionName: user.institution_name,
+          email: user.email,
+          status: user.status,
+          createdAt: user.created_at,
+          user: user
+        }))
       ]
-      
+
+      // Ordenar por fecha de creación (más recientes primero)
       combined.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
       
       setSolicitudes(combined)
@@ -126,12 +106,11 @@ export function SolicitudesList({ onViewDetails }: SolicitudesListProps) {
   }
 
   const filteredSolicitudes = solicitudes.filter((solicitud) => {
-    const searchLower = searchTerm.toLowerCase()
     const matchesSearch =
-      (solicitud.userName || '').toLowerCase().includes(searchLower) ||
-      (solicitud.institutionName || '').toLowerCase().includes(searchLower) ||
-      (solicitud.email || '').toLowerCase().includes(searchLower) ||
-      (solicitud.legalId || '').toLowerCase().includes(searchLower)
+      solicitud.userName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      solicitud.institutionName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      solicitud.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (solicitud.legalId && solicitud.legalId.toLowerCase().includes(searchTerm.toLowerCase()))
 
     const matchesStatus = statusFilter === "all" || solicitud.status === statusFilter
 
@@ -152,7 +131,7 @@ export function SolicitudesList({ onViewDetails }: SolicitudesListProps) {
   }
 
   const getTypeIcon = (type: string) => {
-    return <User className="h-4 w-4" />
+    return type === 'institution' ? <Building className="h-4 w-4" /> : <Mail className="h-4 w-4" />
   }
 
   if (loading) {
@@ -185,7 +164,7 @@ export function SolicitudesList({ onViewDetails }: SolicitudesListProps) {
         <div>
           <h1 className="text-3xl font-bold">Solicitudes Pendientes</h1>
           <p className="text-muted-foreground">
-            Gestiona las solicitudes de nuevos usuarios e instituciones (creados atomicamente)
+            Gestiona las solicitudes de nuevas instituciones y usuarios
           </p>
         </div>
         <Button 
@@ -242,7 +221,7 @@ export function SolicitudesList({ onViewDetails }: SolicitudesListProps) {
                       <div className="flex items-center gap-2">
                         <h3 className="font-semibold">{solicitud.institutionName}</h3>
                         <Badge variant="secondary" className="text-xs">
-                          Usuario + Institución
+                          {solicitud.type === 'institution' ? 'Institución' : 'Usuario'}
                         </Badge>
                       </div>
                       <div className="text-sm text-muted-foreground space-y-1">

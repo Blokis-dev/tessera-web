@@ -5,6 +5,7 @@ import { Sidebar } from "@/components/dashboard/sidebar"
 import { DashboardOverview } from "@/components/dashboard/dashboard-overview"
 import { CreateCertificate } from "@/components/dashboard/create-certificate"
 import { ProfilePage } from "@/components/dashboard/profile-page"
+import { ProtectedRoute } from "@/components/protected-route"
 
 export default function DashboardPage() {
   const [activeTab, setActiveTab] = useState("dashboard")
@@ -44,11 +45,13 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      <Sidebar activeTab={activeTab} onTabChange={setActiveTab} />
-      <div className="lg:pl-64">
-        <main className="p-6 lg:p-8">{renderContent()}</main>
+    <ProtectedRoute allowedRoles={['owner', 'admin']}>
+      <div className="min-h-screen bg-background">
+        <Sidebar activeTab={activeTab} onTabChange={setActiveTab} />
+        <div className="lg:pl-64">
+          <main className="p-6 lg:p-8">{renderContent()}</main>
+        </div>
       </div>
-    </div>
+    </ProtectedRoute>
   )
 }

@@ -1,15 +1,58 @@
+"use client"
+
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { StatsCard } from "@/components/dashboard/stats-card"
 import { Users, Building, CheckCircle, Clock, TrendingUp, AlertTriangle } from "lucide-react"
+import { useEffect, useState } from "react"
+
+interface DashboardStats {
+  totalInstitutions: number
+  pendingInstitutions: number
+  pendingUsers: number
+  totalUsers: number
+}
 
 export function AdminDashboard() {
-  // Datos simulados - en una app real vendrían de una API
-  const stats = {
-    totalInstitutions: 156,
-    pendingRequests: 5,
-    approvedToday: 3,
-    totalUsers: 1247,
-  }
+  const [stats, setStats] = useState<DashboardStats>({
+    totalInstitutions: 0,
+    pendingInstitutions: 0,
+    pendingUsers: 0,
+    totalUsers: 0,
+  })
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    const fetchStats = async () => {
+      const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL
+      
+      try {
+        const [companiesResponse, usersResponse, pendingInstitutionsResponse, pendingUsersResponse] = await Promise.all([
+          fetch(`${baseUrl}/companies`, { credentials: 'include' }),
+          fetch(`${baseUrl}/users`, { credentials: 'include' }),
+          fetch(`${baseUrl}/admin/institutions/pending`, { credentials: 'include' }),
+          fetch(`${baseUrl}/admin/users/pending`, { credentials: 'include' })
+        ])
+
+        const companies = companiesResponse.ok ? await companiesResponse.json() : []
+        const users = usersResponse.ok ? await usersResponse.json() : []
+        const pendingInstitutions = pendingInstitutionsResponse.ok ? await pendingInstitutionsResponse.json() : []
+        const pendingUsers = pendingUsersResponse.ok ? await pendingUsersResponse.json() : []
+
+        setStats({
+          totalInstitutions: companies.length,
+          pendingInstitutions: pendingInstitutions.length,
+          pendingUsers: pendingUsers.length,
+          totalUsers: users.length,
+        })
+      } catch (error) {
+        console.error('Error fetching dashboard stats:', error)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchStats()
+  }, [])
 
   const recentActivity = [
     {
@@ -53,15 +96,15 @@ export function AdminDashboard() {
           trend={{ value: 12, isPositive: true }}
         />
         <StatsCard
-          title="Solicitudes Pendientes"
-          value={stats.pendingRequests}
+          title="Instituciones Pendientes"
+          value={stats.pendingInstitutions}
           description="Requieren revisión"
           icon={Clock}
         />
         <StatsCard
-          title="Aprobadas Hoy"
-          value={stats.approvedToday}
-          description="Solicitudes procesadas hoy"
+          title="Usuarios Pendientes"
+          value={stats.pendingUsers}
+          description="Usuarios por aprobar"
           icon={CheckCircle}
           trend={{ value: 25, isPositive: true }}
         />
