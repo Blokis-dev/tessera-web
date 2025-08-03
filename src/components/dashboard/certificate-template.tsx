@@ -6,21 +6,17 @@ import { QrCode, Shield, Award, Star } from "lucide-react"
 interface CertificateTemplateProps {
   studentName: string
   certificateTitle: string
-  description: string
   issueDate: string
   institutionName?: string
   template: string
-  additionalNotes?: string
 }
 
 export function CertificateTemplate({
   studentName,
   certificateTitle,
-  description,
   issueDate,
   institutionName = "Universidad XYZ",
   template,
-  additionalNotes,
 }: CertificateTemplateProps) {
   const formatDate = (dateString: string) => {
     if (!dateString) return ""
@@ -128,14 +124,6 @@ export function CertificateTemplate({
           <p className={`text-xl font-bold ${styles.accentColor}`}>{studentName || "Nombre del Estudiante"}</p>
           <p className="text-sm text-muted-foreground">ha completado satisfactoriamente</p>
         </div>
-
-        {description && (
-          <div className="bg-white/50 rounded-lg p-3 border border-white/20">
-            <p className="text-xs text-muted-foreground leading-relaxed">{description}</p>
-          </div>
-        )}
-
-        {additionalNotes && <p className="text-xs text-muted-foreground italic">{additionalNotes}</p>}
       </div>
 
       {/* Footer */}

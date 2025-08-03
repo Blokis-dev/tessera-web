@@ -3,15 +3,27 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react'
 import { useRouter, usePathname } from 'next/navigation'
 
+// Actualizar la interfaz User para que coincida con tu estructura de datos
 interface User {
   id: string
   email: string
+  role: string
   full_name: string
-  role: 'admin' | 'owner'
-  institution_id?: string
-  institution_name?: string
   status: string
   first_time_login: boolean
+  created_at: string
+  updated_at: string
+  institution?: {
+    id: string
+    name: string
+    legal_id: string
+    email: string
+    website?: string
+    description?: string
+    logo_url?: string
+    status: string
+  }
+  permissions: string[]
 }
 
 interface AuthContextType {
@@ -33,18 +45,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const checkAuth = async () => {
     try {
       const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL
-      const response = await fetch(`${baseUrl}/auth/verify`, {
-        credentials: 'include'
+      const response = await fetch(`${baseUrl}/api/auth/myinfo`, {
+        method: 'GET',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+        }
       })
 
       if (response.ok) {
-        const data = await response.json()
-        if (data.valid && data.user) {
-          setUser(data.user)
-        } else {
-          setUser(null)
-        }
+        const userData = await response.json()
+        console.log('User data from myinfo:', userData)
+        setUser(userData)
       } else {
+        console.log('Auth check failed, status:', response.status)
         setUser(null)
       }
     } catch (error) {
@@ -62,7 +76,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const logout = async () => {
     try {
       const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL
-      await fetch(`${baseUrl}/auth/logout`, {
+      await fetch(`${baseUrl}/api/auth/logout`, {
         method: 'POST',
         credentials: 'include'
       })
