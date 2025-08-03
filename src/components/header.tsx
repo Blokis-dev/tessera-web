@@ -41,7 +41,7 @@ export function Header() {
             <a href="#contact" className="text-sm font-medium hover:text-primary transition-colors">
               Contacto
             </a>
-              <a href="/verificar" className="text-sm font-medium hover:text-primary transition-colors">
+            <a href="/verificar" className="text-sm font-medium hover:text-primary transition-colors">
               Verificar
             </a>
           </nav>
@@ -58,13 +58,15 @@ export function Header() {
                 Iniciar Sesión
               </Button>
             </Link>
-            <Button className="w-50"
-              style={{
-                background: "linear-gradient(90deg, var(--primary), var(--accent))",
-                color: "var(--primary-foreground)"
-              }}>
-              Comenzar Gratis
-            </Button>
+            <Link href="/auth/register">
+              <Button className="w-50"
+                style={{
+                  background: "linear-gradient(90deg, var(--primary), var(--accent))",
+                  color: "var(--primary-foreground)"
+                }}>
+                Comenzar Gratis
+              </Button>
+            </Link>
           </div>
 
           {/* Mobile menu button */}
@@ -101,11 +103,24 @@ export function Header() {
               <div className="flex flex-col space-y-2 px-3 pt-4">
 
                 <Link href="/auth/login">
-                  <Button variant="outline" className="w-full bg-transparent">Iniciar Sesións</Button>
+                  <Button variant="outline"
+                    className="w-full bg-transparent"
+                    style={{
+                      borderColor: "var(--primary)",
+                      color: "var(--primary)"
+                    }}>
+                    Iniciar Sesión
+                  </Button>
                 </Link>
-                <Button className="w-full bg-gradient-to-r from-tessera-blue-500 to-tessera-cyan-500 hover:from-tessera-blue-600 hover:to-tessera-cyan-600">
-                  Comenzar Gratis
-                </Button>
+                <Link href="/auth/register">
+                  <Button className="w-50"
+                    style={{
+                      background: "linear-gradient(90deg, var(--primary), var(--accent))",
+                      color: "var(--primary-foreground)"
+                    }}>
+                    Comenzar Gratis
+                  </Button>
+                </Link>
               </div>
             </div>
           </div>

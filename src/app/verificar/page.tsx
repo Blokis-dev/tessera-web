@@ -45,7 +45,14 @@ export default function VerificarPage() {
       <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
         {/* Back button */}
         <div className="mb-8">
-          <Button variant="outline" onClick={() => window.history.back()}>
+          <Button 
+            variant="outline" 
+            onClick={() => window.history.back()}
+            style={{
+              borderColor: "var(--primary)",
+              color: "var(--primary)"
+            }}
+          >
             <ArrowLeft className="mr-2 h-4 w-4" />
             Volver
           </Button>
@@ -53,11 +60,23 @@ export default function VerificarPage() {
 
         {/* Header */}
         <div className="text-center space-y-4 mb-12">
-          <div className="mx-auto h-16 w-16 rounded-full bg-gradient-to-br from-tessera-blue-500 to-tessera-cyan-500 flex items-center justify-center mb-6">
+          <div 
+            className="mx-auto h-16 w-16 rounded-full flex items-center justify-center mb-6"
+            style={{
+              background: "linear-gradient(135deg, var(--primary), var(--accent))"
+            }}
+          >
             <Shield className="h-8 w-8 text-white" />
           </div>
           <h1 className="text-4xl sm:text-5xl font-bold tracking-tight">
-            <span className="bg-gradient-to-r from-tessera-blue-600 to-tessera-cyan-600 bg-clip-text text-transparent">
+            <span 
+              className="bg-clip-text text-transparent"
+              style={{
+                background: "linear-gradient(90deg, var(--primary), var(--accent))",
+                WebkitBackgroundClip: "text",
+                backgroundClip: "text"
+              }}
+            >
               Verificar
             </span>{" "}
             Certificado
@@ -70,7 +89,12 @@ export default function VerificarPage() {
 
         {/* Main verification card */}
         <div className="max-w-2xl mx-auto">
-          <Card className="shadow-xl border-0 bg-gradient-to-br from-background to-muted/20">
+          <Card 
+            className="shadow-xl border-0"
+            style={{
+              background: "linear-gradient(135deg, var(--background), var(--muted)/20)"
+            }}
+          >
             <CardHeader className="text-center pb-6">
               <CardTitle className="text-2xl">Verificación de Certificado</CardTitle>
               <CardDescription>
@@ -93,6 +117,9 @@ export default function VerificarPage() {
                       onChange={(e) => setToken(e.target.value)}
                       onKeyPress={handleKeyPress}
                       className="pl-10 h-12 text-base"
+                      style={{
+                        borderColor: "var(--primary)"
+                      }}
                     />
                   </div>
                   <Button
@@ -100,6 +127,10 @@ export default function VerificarPage() {
                     size="icon"
                     className="h-12 w-12 bg-transparent"
                     onClick={() => setQrReaderOpen(true)}
+                    style={{
+                      borderColor: "var(--primary)",
+                      color: "var(--primary)"
+                    }}
                   >
                     <QrCode className="h-5 w-5" />
                   </Button>
@@ -113,7 +144,11 @@ export default function VerificarPage() {
               <Button
                 onClick={handleVerify}
                 disabled={!token.trim()}
-                className="w-full h-12 text-base bg-gradient-to-r from-tessera-blue-500 to-tessera-cyan-500 hover:from-tessera-blue-600 hover:to-tessera-cyan-600"
+                className="w-full h-12 text-base"
+                style={{
+                  background: "linear-gradient(90deg, var(--primary), var(--accent))",
+                  color: "var(--primary-foreground)"
+                }}
               >
                 <Shield className="mr-2 h-5 w-5" />
                 Verificar Certificado
@@ -134,6 +169,10 @@ export default function VerificarPage() {
                 variant="outline"
                 onClick={() => setQrReaderOpen(true)}
                 className="w-full h-12 text-base bg-transparent"
+                style={{
+                  borderColor: "var(--primary)",
+                  color: "var(--primary)"
+                }}
               >
                 <QrCode className="mr-2 h-5 w-5" />
                 Escanear Código QR
@@ -145,7 +184,10 @@ export default function VerificarPage() {
           <div className="grid md:grid-cols-3 gap-4 mt-8">
             <Card className="text-center p-4">
               <CardContent className="pt-4">
-                <Shield className="mx-auto h-8 w-8 text-tessera-blue-500 mb-2" />
+                <Shield 
+                  className="mx-auto h-8 w-8 mb-2" 
+                  style={{ color: "var(--primary)" }}
+                />
                 <h3 className="font-semibold mb-1">100% Seguro</h3>
                 <p className="text-sm text-muted-foreground">Verificación basada en blockchain</p>
               </CardContent>
@@ -153,7 +195,10 @@ export default function VerificarPage() {
 
             <Card className="text-center p-4">
               <CardContent className="pt-4">
-                <QrCode className="mx-auto h-8 w-8 text-tessera-cyan-500 mb-2" />
+                <QrCode 
+                  className="mx-auto h-8 w-8 mb-2" 
+                  style={{ color: "var(--accent)" }}
+                />
                 <h3 className="font-semibold mb-1">Fácil de Usar</h3>
                 <p className="text-sm text-muted-foreground">Escanea QR o ingresa el token</p>
               </CardContent>
@@ -161,7 +206,10 @@ export default function VerificarPage() {
 
             <Card className="text-center p-4">
               <CardContent className="pt-4">
-                <Search className="mx-auto h-8 w-8 text-tessera-blue-500 mb-2" />
+                <Search 
+                  className="mx-auto h-8 w-8 mb-2" 
+                  style={{ color: "var(--primary)" }}
+                />
                 <h3 className="font-semibold mb-1">Instantáneo</h3>
                 <p className="text-sm text-muted-foreground">Resultados en menos de 1 segundo</p>
               </CardContent>
