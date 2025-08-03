@@ -88,7 +88,7 @@ export function VerificationModal({ isOpen, onClose, token }: VerificationModalP
         link.download = "certificado.png"
         link.href = dataUrl
         link.click()
-      } catch (error) {
+      } catch {
         alert("Ocurrió un error al generar la imagen.")
       }
     }
@@ -142,15 +142,9 @@ export function VerificationModal({ isOpen, onClose, token }: VerificationModalP
                 <CertificateTemplate
                   studentName={certificateData.studentName}
                   certificateTitle={certificateData.certificateTitle}
-                  description={certificateData.description}
                   issueDate={certificateData.issueDate}
                   institutionName={certificateData.institutionName}
                   template="completion"
-                  additionalNotes={
-                    certificateData.expirationDate
-                      ? `Válido hasta: ${new Date(certificateData.expirationDate).toLocaleDateString("es-ES")}`
-                      : undefined
-                  }
                 />
               </div>
             </div>

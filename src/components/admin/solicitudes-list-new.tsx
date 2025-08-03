@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Eye, Search, Filter, Calendar, Building, Mail, Phone, Loader2, AlertCircle } from "lucide-react"
+import { Eye, Search, Filter, Calendar, Building, Mail, Loader2, AlertCircle } from "lucide-react"
 
 interface SolicitudesListProps {
   onViewDetails: (id: string) => void

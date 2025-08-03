@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -12,7 +12,6 @@ import {
   XCircle,
   Building,
   Mail,
-  Globe,
   Calendar,
   User,
   FileText,
@@ -59,11 +58,7 @@ export function SolicitudDetails({ solicitudId, onBack }: SolicitudDetailsProps)
   const [isApprovalModalOpen, setIsApprovalModalOpen] = useState(false)
   const [actionType, setActionType] = useState<"approve" | "reject">("approve")
 
-  useEffect(() => {
-    fetchSolicitudDetails()
-  }, [solicitudId])
-
-  const fetchSolicitudDetails = async () => {
+  const fetchSolicitudDetails = useCallback(async () => {
     try {
       const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL
       
@@ -98,7 +93,11 @@ export function SolicitudDetails({ solicitudId, onBack }: SolicitudDetailsProps)
     } finally {
       setLoading(false)
     }
-  }
+  }, [solicitudId])
+
+  useEffect(() => {
+    fetchSolicitudDetails()
+  }, [fetchSolicitudDetails])
 
   const handleApproval = async (status: "verified" | "rejected", notes: string) => {
     try {

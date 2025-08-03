@@ -46,7 +46,7 @@ export function DashboardOverview({ onTabChange }: DashboardOverviewProps) {
         <div>
           <h1 className="text-3xl font-bold">Dashboard</h1>
           <p className="text-muted-foreground">
-            Bienvenido de vuelta, {user?.institution_name || user?.full_name}
+            Bienvenido de vuelta, {user?.institution?.name || user?.full_name}
           </p>
         </div>
         <Button

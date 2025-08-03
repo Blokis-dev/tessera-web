@@ -13,6 +13,8 @@ import { Header } from "@/components/header"
 import { Footer } from "@/components/footer"
 import { QrCode, Shield, Search, ArrowLeft } from "lucide-react"
 
+
+
 export default function VerificarPage() {
   const [token, setToken] = useState("")
   const [qrReaderOpen, setQrReaderOpen] = useState(false)

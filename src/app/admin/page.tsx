@@ -7,6 +7,7 @@ import { SolicitudesList } from "@/components/admin/solicitudes-list"
 import { SolicitudDetails } from "@/components/admin/solicitud-details"
 import { ProtectedRoute } from "@/components/protected-route"
 
+
 export default function AdminPage() {
   const [activeTab, setActiveTab] = useState("dashboard")
   const [selectedSolicitudId, setSelectedSolicitudId] = useState<string | null>(null)

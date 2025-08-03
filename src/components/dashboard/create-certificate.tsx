@@ -1,7 +1,7 @@
 "use client"
 
 import type React from "react"
-import { useState, useRef, useEffect } from "react"
+import { useState, useRef, useEffect, useCallback } from "react"
 import * as htmlToImage from "html-to-image"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -46,35 +46,7 @@ export function CreateCertificate() {
   const { toast } = useToast()
   const { user } = useAuth()
 
-  useEffect(() => {
-    console.log('Base URL:', process.env.NEXT_PUBLIC_API_BASE_URL)
-    console.log('User data from myinfo:', user)
-    console.log('User institution:', user?.institution)
-    console.log('User institution ID:', user?.institution?.id)
-    console.log('User institution name:', user?.institution?.name)
-    fetchInstitutions()
-  }, [])
-
-  useEffect(() => {
-    // Si el usuario tiene una institución asignada, seleccionarla automáticamente
-    if (user?.institution?.id && institutions.length > 0) {
-      console.log('Auto-selecting institution:', user.institution.id)
-      setSelectedInstitutionId(user.institution.id)
-      
-      // También establecer el nombre de la institución en el formulario
-      const userInstitution = institutions.find(inst => inst.id === user.institution?.id)
-      if (userInstitution) {
-        console.log('Found user institution in list:', userInstitution)
-        setFormData(prev => ({ ...prev, institutionName: userInstitution.name }))
-      } else {
-        // Si no encuentra la institución en la lista, usar el nombre del usuario
-        console.log('Using institution name from user data:', user.institution.name)
-        setFormData(prev => ({ ...prev, institutionName: user.institution?.name || '' }))
-      }
-    }
-  }, [user, institutions])
-
-  const fetchInstitutions = async () => {
+  const fetchInstitutions = useCallback(async () => {
     try {
       const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL
       
@@ -128,11 +100,36 @@ export function CreateCertificate() {
         description: "No se pudo conectar con el servidor para cargar las instituciones",
         variant: "destructive",
       })
-      
-      // Establecer instituciones vacías en caso de error
-      setInstitutions([])
     }
-  }
+  }, [toast])
+
+  useEffect(() => {
+    console.log('Base URL:', process.env.NEXT_PUBLIC_API_BASE_URL)
+    console.log('User data from myinfo:', user)
+    console.log('User institution:', user?.institution)
+    console.log('User institution ID:', user?.institution?.id)
+    console.log('User institution name:', user?.institution?.name)
+    fetchInstitutions()
+  }, [fetchInstitutions, user])
+
+  useEffect(() => {
+    // Si el usuario tiene una institución asignada, seleccionarla automáticamente
+    if (user?.institution?.id && institutions.length > 0) {
+      console.log('Auto-selecting institution:', user.institution.id)
+      setSelectedInstitutionId(user.institution.id)
+      
+      // También establecer el nombre de la institución en el formulario
+      const userInstitution = institutions.find(inst => inst.id === user.institution?.id)
+      if (userInstitution) {
+        console.log('Found user institution in list:', userInstitution)
+        setFormData(prev => ({ ...prev, institutionName: userInstitution.name }))
+      } else {
+        // Si no encuentra la institución en la lista, usar el nombre del usuario
+        console.log('Using institution name from user data:', user.institution.name)
+        setFormData(prev => ({ ...prev, institutionName: user.institution?.name || '' }))
+      }
+    }
+  }, [user, institutions])
 
   const handleInputChange = (field: keyof FormData, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }))

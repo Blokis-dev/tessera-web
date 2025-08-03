@@ -4,12 +4,10 @@ import type React from "react"
 
 import { useState, useEffect } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Mail, Building, AlertCircle, Loader2 } from "lucide-react"
-import { useAuth } from "@/lib/auth-context"
 
 interface UserProfile {
   id: string
@@ -27,7 +25,6 @@ interface UserProfile {
 }
 
 export function ProfilePage() {
-  const { user } = useAuth()
   const [profileData, setProfileData] = useState<UserProfile | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState("")

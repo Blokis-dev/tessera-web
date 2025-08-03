@@ -23,7 +23,7 @@ const navigation = [
 
 export function Sidebar({ activeTab, onTabChange }: SidebarProps) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
-  const { logout, user } = useAuth()
+  const { logout } = useAuth()
 
   return (
     <>

@@ -7,6 +7,7 @@ import { CreateCertificate } from "@/components/dashboard/create-certificate"
 import { ProfilePage } from "@/components/dashboard/profile-page"
 import { ProtectedRoute } from "@/components/protected-route"
 
+
 export default function DashboardPage() {
   const [activeTab, setActiveTab] = useState("dashboard")
 

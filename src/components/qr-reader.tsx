@@ -32,7 +32,7 @@ export function QRReader({ isOpen, onClose, onScan }: QRReaderProps) {
         videoRef.current.srcObject = stream
         videoRef.current.play()
       }
-    } catch (err) {
+    } catch {
       setError("No se pudo acceder a la cámara. Verifica los permisos.")
       setIsScanning(false)
     }

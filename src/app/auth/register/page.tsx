@@ -27,6 +27,8 @@ interface InstitutionData {
     logo: File | null
 }
 
+
+
 export default function RegisterForm() {
     const [step, setStep] = useState(1)
     const [isLoading, setIsLoading] = useState(false)

@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Eye, Search, Filter, Calendar, Building, Mail, Phone, Loader2, AlertCircle, User } from "lucide-react"
+import { Eye, Search, Filter, Calendar, Building, Mail, Loader2, AlertCircle, User } from "lucide-react"
 
 interface SolicitudesListProps {
   onViewDetails: (id: string) => void
@@ -172,7 +172,7 @@ export function SolicitudesList({ onViewDetails }: SolicitudesListProps) {
     }
   }
 
-  const getTypeIcon = (type: string) => {
+  const getTypeIcon = () => {
     return <User className="h-4 w-4" style={{ color: "var(--primary)" }} />
   }
 
@@ -342,7 +342,7 @@ export function SolicitudesList({ onViewDetails }: SolicitudesListProps) {
                         background: "linear-gradient(135deg, var(--primary)/10, var(--accent)/10)"
                       }}
                     >
-                      {getTypeIcon(solicitud.type)}
+                      {getTypeIcon()}
                     </div>
                     <div className="space-y-2 flex-1">
                       <div className="flex items-center gap-3">

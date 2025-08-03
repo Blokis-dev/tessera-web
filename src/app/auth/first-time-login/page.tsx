@@ -2,7 +2,7 @@
 
 import type React from "react"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, Suspense } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
@@ -12,7 +12,9 @@ import { Label } from "@/components/ui/label"
 import { Shield, Eye, EyeOff, AlertCircle } from "lucide-react"
 import { ThemeToggle } from "@/components/theme-toggle"
 
-export default function FirstTimeLoginForm() {
+
+
+function FirstTimeLoginFormContent() {
     const [showPasswords, setShowPasswords] = useState({
         temporary: false,
         new: false,
@@ -288,5 +290,13 @@ export default function FirstTimeLoginForm() {
                 </Card>
             </div>
         </div>
+    )
+}
+
+export default function FirstTimeLoginForm() {
+    return (
+        <Suspense fallback={<div>Cargando...</div>}>
+            <FirstTimeLoginFormContent />
+        </Suspense>
     )
 }

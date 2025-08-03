@@ -19,7 +19,7 @@ export function AdminDashboard() {
     pendingUsers: 0,
     totalUsers: 0,
   })
-  const [loading, setLoading] = useState(true)
+  const [, setLoading] = useState(true)
 
   useEffect(() => {
     const fetchStats = async () => {

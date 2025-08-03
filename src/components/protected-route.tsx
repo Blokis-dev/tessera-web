@@ -42,7 +42,7 @@ export function ProtectedRoute({
   }
 
   // Verificar roles permitidos
-  if (!allowedRoles.includes(user.role)) {
+  if (!allowedRoles.includes(user.role as 'admin' | 'owner')) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-red-50 to-pink-50 dark:from-gray-900 dark:to-gray-800 flex items-center justify-center p-4">
         <div className="text-center">

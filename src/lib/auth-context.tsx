@@ -98,10 +98,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     const publicRoutes = ['/auth/login', '/auth/register', '/auth/first-time-login', '/']
     const adminRoutes = ['/admin']
-    const ownerRoutes = ['/dashboard']
     const isPublicRoute = publicRoutes.some(route => pathname.startsWith(route))
     const isAdminRoute = adminRoutes.some(route => pathname.startsWith(route))
-    const isOwnerRoute = ownerRoutes.some(route => pathname.startsWith(route))
 
     // Si no hay usuario y está en ruta protegida, redirigir al login
     if (!user && !isPublicRoute) {
